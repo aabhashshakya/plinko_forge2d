@@ -42,7 +42,6 @@ class _GameAppState extends State<GameApp> {
 
   late final Plinko plinko;
   late VoidCallback scoreListener;
-  late VoidCallback playStateListener;
 
   @override
   void initState() {
@@ -63,7 +62,6 @@ class _GameAppState extends State<GameApp> {
   void dispose() {
     super.dispose();
     plinko.score.removeListener(scoreListener);
-    plinko.playState.removeListener(playStateListener);
   }
 
   @override
@@ -251,6 +249,62 @@ class _GameAppState extends State<GameApp> {
                                       plinko.setPlayState(PlayState.ready);
                                       context.read<GameProvider>().setBalls(count);
                                     }),
+                                Expanded(
+                                  child: MaterialButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16)),
+                                    minWidth: 0,
+                                    padding: const EdgeInsets.all(0.0),
+                                    textColor: Colors.white,
+                                    elevation: 16.0,
+                                    child: Container(
+                                      margin: EdgeInsets.zero,
+                                      padding: EdgeInsets.zero,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        image: const DecorationImage(
+                                            image: AssetImage(
+                                                'assets/images/bg.jpeg'),
+                                            fit: BoxFit.cover),
+                                      ),
+                                      child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0, vertical: 8.0),
+                                          child:
+                                          ValueListenableBuilder<PlayState>(
+                                            valueListenable: plinko.playState,
+                                            builder: (context, state, child) {
+                                              return Text(
+                                                state == PlayState.playing
+                                                    ? "PLAYING"
+                                                    : "PLAY",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleSmall!
+                                                    .copyWith(
+                                                    color: Colors.white),
+                                              );
+                                            },
+                                          )),
+                                    ),
+                                    // ),
+                                    onPressed: () {
+                                      if (plinko.getPlayState() ==
+                                          PlayState.playing) {
+                                        return;
+                                      }
+                                      if (context
+                                          .read<GameProvider>()
+                                          .trySpendCredits()) {
+                                        plinko.playGame(context
+                                            .read<GameProvider>()
+                                            .roundInfo);
+                                      } else {
+                                        plinko.setPlayState(PlayState.gameOver);
+                                      }
+                                    },
+                                  ),
+                                ),
                                 MaterialButton(
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16)),
@@ -276,12 +330,10 @@ class _GameAppState extends State<GameApp> {
                                           valueListenable: plinko.playState,
                                           builder: (context, state, child) {
                                             return Text(
-                                              state == PlayState.playing
-                                                  ? "PLAYING"
-                                                  : "PLAY",
+                                            "SIM",
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .titleMedium!
+                                                  .titleSmall!
                                                   .copyWith(
                                                   color: Colors.white),
                                             );
@@ -297,7 +349,7 @@ class _GameAppState extends State<GameApp> {
                                     if (context
                                         .read<GameProvider>()
                                         .trySpendCredits()) {
-                                      plinko.playGame(context
+                                      plinko.simulateGame(context
                                           .read<GameProvider>()
                                           .roundInfo);
                                     } else {

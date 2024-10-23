@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -78,8 +79,41 @@ class Plinko extends Forge2DGame {
 
           if (roundInfo.isSimulation) {
             //write simulation output in a CSV
-            List<String> header = ["S.N", "seed", "result"];
-            myCSV(header, simulationResult);
+            // List<String> header = ["Ball ID", "result", "prize_column"];
+            // myCSV(header, simulationResult, fileName: "plinko_results")
+            //     .then((_) {
+            //write probability output in csv
+            var moneyMultipliers = moneyMultiplier.mapIndexed((index,e) => "${e}x,$index").toList();
+            Map<String, int> occurenceMap = { for (var e in moneyMultipliers) e : 0 };
+
+
+
+            for (var e in simulationResult) {
+              var multiplier ="${e[1]},${e.last}";
+              if (!occurenceMap.containsKey(multiplier)) {
+                occurenceMap[multiplier] = 1;
+              } else {
+                occurenceMap[multiplier] = occurenceMap[multiplier]! + 1;
+              }
+            }
+            List<String> header2 = occurenceMap.keys.toList(); // the multipliers are the column headers
+            List<String> column1 =
+            occurenceMap.values.map((e) => e.toString()).toList(); //no. of times ball hit those multipliers
+            List<String> column2 =
+            column1.map((e) => "${(int.parse(e)/roundInfo.balls)*100}%").toList(); //the probability of being hit
+
+            //add a total
+            header2.add("Total balls");
+            column1.add("${roundInfo.balls}");
+            column2.add((""));
+
+            //add RTP header
+            header2.add("RTP");
+            column1.add("${roundInfo.totalWinnings}/${roundInfo.totalBet}=");
+            column2.add(("${(roundInfo.totalWinnings.toDouble()/roundInfo.totalBet)*100}%"));
+
+            myCSV(header2, [column1,column2], fileName: "plinko_distribution");
+            //   });
           }
         }
       case PlayState.playing || PlayState.ready:
@@ -197,18 +231,15 @@ class Plinko extends Forge2DGame {
     // no matter which direction the ball goes. The ball's velocity is then scaled up to be a 1/4 of the height of the game.
     // Getting these various values right involves some iteration, also known as playtesting in the industry.
 
-    var seed = 1;
-
     for (int i = 0; i < roundInfo.balls; i++) {
-      await Future.delayed(const Duration(milliseconds: 1000));
-      final random = Random(seed).nextDouble();
+      await Future.delayed(const Duration(milliseconds: 250));
+      var random = rand.nextDouble();
+      var offset = random > 0.5 ? 40 : -40;
       world.add(Ball(
-          seed: seed,
-          index: i,
-          ballPosition: Vector2(400, 300),
-          //initial position of the ball, which s  center
-        )); //scale is the speed, how fast it moves
-      seed++;
+        index: i,
+        ballPosition: Vector2(width /2 + offset , height / 4)..zoomAdapted(),
+        //initial position of the ball, which s  center
+      )); //scale is the speed, how fast it moves
     }
   }
 

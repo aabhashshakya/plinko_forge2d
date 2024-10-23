@@ -74,6 +74,14 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
     if (other is Wall) {
       //game is over if ball goes out of play area
       game.activeBalls--;
+      if (game.roundInfo.isSimulation) {
+        //add result to CSV file
+        var result = [
+          index.toString(), //S.N
+          "-1" //result
+        ];
+        game.simulationResult.add(result);
+      }
       if (game.activeBalls <= 0) {
         //round over if it was the last ball
         game.setPlayState(PlayState.roundOver);

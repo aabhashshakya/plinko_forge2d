@@ -82,8 +82,9 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
       //add result to CSV file
       var result = [
         ball.index.toString(), //S.N
-        ball.seed.toString(), //seed
-        "${multiplier}x" //result
+        "${multiplier}x",
+        column.toString()
+        //result
       ];
       game.simulationResult.add(result);
     }
@@ -131,7 +132,7 @@ final moneyMultiplier = [
   1.0,
   0.8,
   0.5,
-  0.0, //middle
+  0.5, //middle
   0.5,
   0.8,
   1.0,
@@ -140,6 +141,7 @@ final moneyMultiplier = [
   2.0,
   2.5,
 ];
+
 
 //total 15 colors
 const moneyMultiplierColors = [

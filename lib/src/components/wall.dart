@@ -10,7 +10,7 @@ class Wall extends BodyComponent<Plinko> with ContactCallbacks {
   final Vector2 size;
 
   Wall(this.position, this.size) :super(  paint: Paint()
-    ..color = Colors.red
+    ..color = Colors.transparent
     ..style = PaintingStyle.fill);
 
   @override
