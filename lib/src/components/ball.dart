@@ -28,7 +28,6 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   @override
   void update(double dt) {
     super.update(dt);
-      super.update(dt);
       Vector2 velocityTmp = Vector2.zero();
       velocity.y += 20000 * dt;
       velocityTmp

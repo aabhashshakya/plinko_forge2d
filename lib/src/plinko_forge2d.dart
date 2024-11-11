@@ -10,6 +10,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:plinko_forge2d/src/components/obstacle/obstacle_helper.dart';
 import 'package:plinko_forge2d/src/model/round_info.dart';
+import 'package:plinko_forge2d/src/utils/always_notify_value_notifier.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
 import 'package:to_csv/to_csv.dart';
 
@@ -34,6 +35,24 @@ class Plinko extends Forge2DGame {
             height: gameHeight,
           ),
         );
+  // Lock game to 60fps
+  static const double fixedTimeStep = 1 / 60;
+  double accumulator = 0;
+
+  @override
+  void update(double dt) {
+    // Accumulate the elapsed time
+    accumulator += dt;
+
+    // Execute fixed update steps as long as the accumulator allows
+    while (accumulator >= fixedTimeStep) {
+      super.update(fixedTimeStep); // Forge2D's internal update method
+      accumulator -= fixedTimeStep;
+    }
+
+    // Note: Any leftover time in the accumulator will be carried to the next frame,
+    // ensuring stable physics updates over time.
+  }
 
   var roundInfo = RoundInfo.getDefault();
   var activeBalls = minBalls;
@@ -53,7 +72,7 @@ class Plinko extends Forge2DGame {
 
   final rand = math.Random();
 
-  final ValueNotifier<double> score = ValueNotifier(0);
+  final AlwaysNotifyValueNotifier<double> score = AlwaysNotifyValueNotifier(0);
   final ValueNotifier<List<MoneyMultiplier>> gameResults = ValueNotifier([]);
 
   double get width => size.x;
