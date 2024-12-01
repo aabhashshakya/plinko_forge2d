@@ -7,20 +7,23 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/body_component.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
+import 'package:plinko_forge2d/src/constants/sound_manager.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
 
 import '../../../constants/config.dart';
+import '../../../constants/shared_prefs.dart';
+import '../../plinko_forge2d.dart';
 
-class Obstacle extends BodyComponent with ContactCallbacks {
+class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
   Obstacle({
     required this.row,
     required this.column,
     required this.position,
   }) : super(
-            paint: Paint()
-              ..color = Colors.white
-              ..style = PaintingStyle.fill,
-          );
+          paint: Paint()
+            ..color = Colors.white
+            ..style = PaintingStyle.fill,
+        );
 
   @override
   final Vector2 position;
@@ -33,7 +36,7 @@ class Obstacle extends BodyComponent with ContactCallbacks {
     super.onLoad();
     var sprite = await Sprite.load("obstacle.png");
     var size = Vector2(35, 35).zoomAdapted();
-    var s = SpriteComponent(sprite: sprite, size: size,anchor: Anchor.center);
+    var s = SpriteComponent(sprite: sprite, size: size, anchor: Anchor.center);
     add(s);
   }
 
@@ -55,10 +58,14 @@ class Obstacle extends BodyComponent with ContactCallbacks {
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 
+  DateTime lastSoundPlayed = DateTime.now();
+
   @override
   void beginContact(Object other, Contact contact) {
     // TODO: implement beginContact
     super.beginContact(other, contact);
+    SoundManager.playCollisionSound();
+
     final colorEffect = ColorEffect(
       const Color(0xffB59410),
       EffectController(duration: 0.4, reverseDuration: 1),
@@ -71,4 +78,5 @@ class Obstacle extends BodyComponent with ContactCallbacks {
     // add(colorEffect);
     add(effect);
   }
+
 }

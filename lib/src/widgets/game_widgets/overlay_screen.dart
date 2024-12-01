@@ -36,12 +36,16 @@ class OverlayScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           children: [
             OutlinedText(
-             text: title,
+              color: color,
+              text: title,
+              fontSize: 30,
               align: TextAlign.center,
             ).animate().slideY(duration: 750.ms, begin: -3, end: 0),
             const SizedBox(height: 16),
             OutlinedText(
+              color: color,
               text: subtitle,
+              fontSize: 22,
               align: TextAlign.center,
             )
                 .animate(onPlay: (controller) => controller.repeat())

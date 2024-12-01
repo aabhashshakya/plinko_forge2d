@@ -6,6 +6,7 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:plinko_forge2d/src/constants/sound_manager.dart';
 import 'package:plinko_forge2d/src/dialogs/exit_game_dialog.dart';
 import 'package:plinko_forge2d/src/dialogs/pause_menu.dart';
 import 'package:plinko_forge2d/src/provider/game_provider.dart';
@@ -108,15 +109,11 @@ class _GameAppState extends State<GameApp> {
                               game: plinko,
                               overlayBuilderMap: {
                                 PlayState.roundOver.name: (context, game) {
-                                  if (SharedPrefs.isSoundEnabled()) {
-                                    FlameAudio.play('win.mp3');
-                                  }
+                                  SoundManager.playWinSound();
                                   return Container();
                                 },
                                 PlayState.gameOver.name: (context, game) {
-                                  if (SharedPrefs.isSoundEnabled()) {
-                                    FlameAudio.play('lose.mp3');
-                                  }
+                                  SoundManager.playLoseSound();
                                   return OverlayScreen(
                                     color: Colors.red,
                                     title: 'N O   C R E D I T S',
@@ -171,9 +168,13 @@ class _GameAppState extends State<GameApp> {
                                                   return Dialog(
                                                     child: PauseMenu(
                                                         onResumeTapped: () {
+                                                          plinko.pauseEngine();
                                                         },
                                                         onVolumeTapped:
-                                                            (isSoundEnabled) {},
+                                                            (isSoundEnabled) {
+                                                              plinko.resumeEngine();
+
+                                                            },
                                                         onExitGameTapped: () {
                                                           Navigator.of(context)
                                                               .pop();
