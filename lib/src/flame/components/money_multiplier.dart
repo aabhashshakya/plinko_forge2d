@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/palette.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:plinko_forge2d/src/flame/plinko_forge2d.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
 
+import '../../constants/shared_prefs.dart';
 import 'ball.dart';
 import '../../constants/config.dart';
 
@@ -31,9 +33,11 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
   final Radius cornerRadius;
   late num multiplier;
   late SpriteComponent visualComponent;
+  late AudioPool audioPool;
 
   @override
   Future<void> onLoad() async {
+     audioPool = await FlameAudio.createPool('bounce.mp3', maxPlayers: 2);
     multiplier = moneyMultiplier[column];
     var sprite = await Sprite.load(moneyMultiplierAsset[column]);
     visualComponent =
@@ -75,7 +79,11 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
     if (other is Ball) {
+      if(SharedPrefs.isSoundEnabled()) {
+        audioPool.start();
+      }
       applyEffect();
+
       _winCondition(other);
     }
   }

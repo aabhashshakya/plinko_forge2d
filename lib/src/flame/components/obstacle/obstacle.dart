@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/body_component.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class Obstacle extends BodyComponent with ContactCallbacks {
   final Vector2 position;
   final int row;
   final int column;
+  late AudioPool audioPool;
 
   @override
   Future<void> onLoad() async {
