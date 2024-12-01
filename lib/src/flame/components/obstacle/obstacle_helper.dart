@@ -1,7 +1,8 @@
 ///Created by Aabhash Shakya on 10/17/24
 import 'package:flame/components.dart';
 
-import '../../../config.dart';
+import '../../../constants/config.dart';
+
 
 class ObstacleHelper {
   Vector2? _lastObstaclePosition;
@@ -25,7 +26,7 @@ class ObstacleHelper {
       _reset();
     }
 
-    var y = (row + 180) * (obstacleRadius * 2.7) + (row * obstacleGutter * 2.7);
+    var y = (row + 200) * (obstacleRadius * 2.7) + (row * obstacleGutter * 2.7);
     double x;
     if (column == 0) {
       if (row == 0) {

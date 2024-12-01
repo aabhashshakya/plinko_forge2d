@@ -8,14 +8,16 @@ import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
-import 'package:plinko_forge2d/src/components/obstacle/obstacle_helper.dart';
 import 'package:plinko_forge2d/src/model/round_info.dart';
 import 'package:plinko_forge2d/src/utils/always_notify_value_notifier.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
 import 'package:to_csv/to_csv.dart';
 
-import '../config.dart';
+import '../constants/config.dart';
 import 'components/components.dart';
+import 'components/money_multiplier.dart';
+import 'components/obstacle/obstacle.dart';
+import 'components/obstacle/obstacle_helper.dart';
 
 enum PlayState { ready, playing, roundOver, gameOver } // Add this enumeration
 
@@ -35,6 +37,7 @@ class Plinko extends Forge2DGame {
             height: gameHeight,
           ),
         );
+
   // Lock game to 60fps
   static const double fixedTimeStep = 1 / 60;
   double accumulator = 0;
@@ -102,24 +105,29 @@ class Plinko extends Forge2DGame {
             // myCSV(header, simulationResult, fileName: "plinko_results")
             //     .then((_) {
             //write probability output in csv
-            var moneyMultipliers = moneyMultiplier.mapIndexed((index,e) => "${e}x,$index").toList();
-            Map<String, int> occurenceMap = { for (var e in moneyMultipliers) e : 0 };
-
-
+            var moneyMultipliers = moneyMultiplier
+                .mapIndexed((index, e) => "${e}x,$index")
+                .toList();
+            Map<String, int> occurenceMap = {
+              for (var e in moneyMultipliers) e: 0
+            };
 
             for (var e in simulationResult) {
-              var multiplier ="${e[1]},${e.last}";
+              var multiplier = "${e[1]},${e.last}";
               if (!occurenceMap.containsKey(multiplier)) {
                 occurenceMap[multiplier] = 1;
               } else {
                 occurenceMap[multiplier] = occurenceMap[multiplier]! + 1;
               }
             }
-            List<String> header2 = occurenceMap.keys.toList(); // the multipliers are the column headers
-            List<String> column1 =
-            occurenceMap.values.map((e) => e.toString()).toList(); //no. of times ball hit those multipliers
-            List<String> column2 =
-            column1.map((e) => "${(int.parse(e)/roundInfo.balls)*100}%").toList(); //the probability of being hit
+            List<String> header2 = occurenceMap.keys
+                .toList(); // the multipliers are the column headers
+            List<String> column1 = occurenceMap.values
+                .map((e) => e.toString())
+                .toList(); //no. of times ball hit those multipliers
+            List<String> column2 = column1
+                .map((e) => "${(int.parse(e) / roundInfo.balls) * 100}%")
+                .toList(); //the probability of being hit
 
             //add a total
             header2.add("Total balls");
@@ -129,9 +137,10 @@ class Plinko extends Forge2DGame {
             //add RTP header
             header2.add("RTP");
             column1.add("${roundInfo.totalWinnings}/${roundInfo.totalBet}=");
-            column2.add(("${(roundInfo.totalWinnings.toDouble()/roundInfo.totalBet)*100}%"));
+            column2.add(
+                ("${(roundInfo.totalWinnings.toDouble() / roundInfo.totalBet) * 100}%"));
 
-            myCSV(header2, [column1,column2], fileName: "plinko_distribution");
+            myCSV(header2, [column1, column2], fileName: "plinko_distribution");
             //   });
           }
         }
@@ -198,7 +207,6 @@ class Plinko extends Forge2DGame {
             column: i,
             cornerRadius: const Radius.circular(12),
             multiplierPosition: _calculateMoneyMultiplierPosition(i),
-            color: moneyMultiplierColors[i],
             size: _calculateMoneyMultiplierSize())
     ]);
   }
@@ -221,14 +229,18 @@ class Plinko extends Forge2DGame {
     // Getting these various values right involves some iteration, also known as playtesting in the industry.
 
     for (int i = 0; i < roundInfo.balls; i++) {
-      await Future.delayed(const Duration(milliseconds: 250));
-      var random = rand.nextDouble();
-      var offset = random > 0.5 ? 40 : -40;
+      await Future.delayed(const Duration(milliseconds: 300));
+      var offset = Random().randomBetween(-40, 40);
+      if(offset >= -10 && offset <=10){
+        offset = (offset * Random().randomBetween(-4, 4)).toInt();
+      }
       world.add(Ball(
-          index: i,
-          ballPosition: Vector2(width /2 + offset , height / 4)..zoomAdapted(),
-          //initial position of the ball, which s  center
-        )); //scale is the speed, how fast it moves
+        velocity: Vector2(Random().randomBetween(-5, 5).toDouble(),
+            Random().randomBetween(-10, 10).toDouble()),
+        index: i,
+        ballPosition: Vector2(width / 2 + offset, height / 4)..zoomAdapted(),
+        //initial position of the ball, which s  center
+      )); //scale is the speed, how fast it moves
     }
   }
 
@@ -251,12 +263,16 @@ class Plinko extends Forge2DGame {
     // Getting these various values right involves some iteration, also known as playtesting in the industry.
 
     for (int i = 0; i < roundInfo.balls; i++) {
-      await Future.delayed(const Duration(milliseconds: 250));
-      var random = rand.nextDouble();
-      var offset = random > 0.5 ? 40 : -40;
+      await Future.delayed(const Duration(milliseconds: 300));
+      var offset = Random().randomBetween(-40, 40);
+      if(offset >= -10 && offset <= 10){
+        offset = (offset * Random().randomBetween(-4, 4)).toInt();
+      }
       world.add(Ball(
+        velocity: Vector2(Random().randomBetween(-5, 5).toDouble(),
+            Random().randomBetween(-10, 10).toDouble()),
         index: i,
-        ballPosition: Vector2(width /2 + offset , height / 4)..zoomAdapted(),
+        ballPosition: Vector2(width / 2 + offset, height / 4)..zoomAdapted(),
         //initial position of the ball, which s  center
       )); //scale is the speed, how fast it moves
     }
@@ -266,16 +282,16 @@ class Plinko extends Forge2DGame {
   Color backgroundColor() => Colors.transparent; //make game transparent
 
   Vector2 _calculateMoneyMultiplierPosition(int column) {
-    var bottomPadding = 30 /zoom;
+    var bottomPadding = 30 / zoom;
     var bottomObstacle = obstacleHelper.getObstaclePosition(
         obstacleRows - 1, column); //-1 as index is 0 < maxRows
 
-    return Vector2(bottomObstacle.x   , bottomObstacle.y +bottomPadding );
+    return Vector2(bottomObstacle.x, bottomObstacle.y + bottomPadding);
   }
 
   Vector2 _calculateMoneyMultiplierSize() {
-    var height = 80.0;
-    var width = obstacleDistance.toDouble() - 2;
+    var height = 95.0;
+    var width = obstacleDistance.toDouble() + 5;
     return Vector2(width, height)..zoomAdapted();
   }
 }

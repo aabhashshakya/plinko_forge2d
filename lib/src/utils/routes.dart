@@ -2,8 +2,8 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:plinko_forge2d/src/game_app.dart';
-import 'package:plinko_forge2d/src/widgets/welcome_screen.dart';
+import 'package:plinko_forge2d/src/screens/game_app.dart';
+import 'package:plinko_forge2d/src/screens/welcome_screen.dart';
 
 class AppRoutes {
   static Route onGenerateRoute(RouteSettings settings) {

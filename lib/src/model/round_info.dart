@@ -1,8 +1,8 @@
 ///Created by Aabhash Shakya on 10/18/24
 import 'package:flutter/material.dart';
-import 'package:plinko_forge2d/config.dart';
+import 'package:plinko_forge2d/src/constants/config.dart';
 
-import '../components/components.dart';
+import '../flame/components/components.dart';
 
 class RoundInfo extends ChangeNotifier {
   RoundInfo._(this.bet, this.balls, this.totalBet, this.totalWinnings,

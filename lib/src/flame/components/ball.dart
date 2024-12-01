@@ -1,7 +1,9 @@
+import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
-import 'package:plinko_forge2d/config.dart';
+import 'package:plinko_forge2d/src/constants/config.dart';
+import 'package:plinko_forge2d/src/utils/extensions.dart';
 
 import '../plinko_forge2d.dart';
 import 'components.dart';
@@ -10,8 +12,9 @@ import 'components.dart';
 // CircleComponent, like RectangleComponent, derives from PositionedComponent, so you can position the ball on the screen.
 // More importantly, its position can be updated.
 class Ball extends BodyComponent<Plinko> with ContactCallbacks {
-  Ball({
+  Ball( {
     this.seed,
+    required this.velocity,
     required this.index,
     required this.ballPosition,
   }) : super(
@@ -23,7 +26,16 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   final Vector2 ballPosition;
   final int? seed;
   final int index;
-  final Vector2 velocity =Vector2.zero();
+  final Vector2 velocity;
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    var sprite = await Sprite.load("ball.png");
+    var size = Vector2(50, 50).zoomAdapted();
+    var s = SpriteComponent(sprite: sprite, size: size,anchor: Anchor.center);
+    add(s);
+  }
 
   @override
   void update(double dt) {

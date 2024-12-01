@@ -33,11 +33,13 @@ dependencies:
   flame_forge2d: ^0.18.2+1
   flutter_animate: ^4.5.0
   flame_audio: ^2.10.3
+  flutter_screenutil: ^5.9.3
   google_fonts: ^6.1.0
   animated_text_lerp: ^1.0.5
   collection: ^1.18.0
   provider: ^6.0.3
   to_csv: ^4.0.4
+  shared_preferences: ^2.1.0
   flutter:
     sdk: flutter
 

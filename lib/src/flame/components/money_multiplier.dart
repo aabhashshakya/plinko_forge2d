@@ -5,21 +5,23 @@ import 'package:flame/effects.dart';
 import 'package:flame/palette.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
-import 'package:plinko_forge2d/src/components/ball.dart';
-import 'package:plinko_forge2d/src/plinko_forge2d.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:plinko_forge2d/src/flame/plinko_forge2d.dart';
+import 'package:plinko_forge2d/src/utils/extensions.dart';
 
-import '../../config.dart';
+import 'ball.dart';
+import '../../constants/config.dart';
 
 class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
   MoneyMultiplier({
     required this.column,
-    required this.color,
     required this.cornerRadius,
     required this.multiplierPosition,
     required this.size,
   }) : super(
           paint: Paint()
-            ..color = color
+            ..color = Colors.transparent
             ..style = PaintingStyle.fill,
         );
 
@@ -27,16 +29,23 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
   final Vector2 size;
   final int column;
   final Radius cornerRadius;
-  final Color color;
   late num multiplier;
+  late SpriteComponent visualComponent;
 
   @override
   Future<void> onLoad() async {
     multiplier = moneyMultiplier[column];
-    add(TextComponent(text: 'x$multiplier', textRenderer: _regular)
-      ..anchor = Anchor.topCenter
-      ..x = size.x / 2
-      ..y = size.y * 0.3);
+    var sprite = await Sprite.load(moneyMultiplierAsset[column]);
+    visualComponent =
+        SpriteComponent(sprite: sprite, size: size, anchor: Anchor.topLeft);
+
+    visualComponent
+        .add(TextComponent(text: 'x$multiplier', textRenderer: _regular)
+          ..anchor = Anchor.topCenter
+          ..x = size.x / 2.02
+          ..y = size.y * 0.28);
+    add(visualComponent);
+
     return super.onLoad();
   }
 
@@ -55,7 +64,7 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
       ..restitution = 0.0; // Bouncy effect
 
     final bodyDef = BodyDef()
-    ..userData=this
+      ..userData = this
       ..position = multiplierPosition
       ..type = BodyType.static;
 
@@ -66,6 +75,7 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
     if (other is Ball) {
+      applyEffect();
       _winCondition(other);
     }
   }
@@ -92,19 +102,6 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
     if (game.activeBalls <= 0) {
       game.setPlayState(PlayState.roundOver);
     }
-    final glowEffect = GlowEffect(
-        20, EffectController(duration: 0.5, reverseDuration: 1),
-        style: BlurStyle.solid);
-
-    // add(colorEffect);
-
-    // final scaleEffect = ScaleEffect.by(
-    //   Vector2.all(1.1),
-    //   EffectController(duration: 0.5, reverseDuration: 0.5),
-    // );
-    //
-    // add(scaleEffect);
-    add(glowEffect);
 
     //win condition
     //The most important new concept this code introduces is how the player achieves the win condition. The win condition
@@ -113,15 +110,28 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
     // The key point to understand is that component removal is a queued command. It removes the brick after this code runs,
     // but before the next tick of the game world.
   }
+
+  void applyEffect() {
+    visualComponent.add(MoveByEffect(
+      Vector2(0, 15).zoomAdapted(),
+      EffectController(duration: 0.3, reverseDuration: 0.2),
+    ));
+  }
 }
 
-final _regularTextStyle = TextStyle(
-  fontSize: 18/zoom,
-  color: BasicPalette.white.color,
-);
-final _regular = TextPaint(
-  style: _regularTextStyle,
-);
+final _regularTextStyle = GoogleFonts.poppins(
+    fontSize: 18 / zoom,
+    color: BasicPalette.white.color,
+    fontWeight: FontWeight.bold,
+    //shadows to give it the text an outline
+    shadows: [
+      Shadow(color: Colors.black, blurRadius: 3.w),
+      Shadow(color: Colors.black, blurRadius: 3.w),
+      Shadow(color: Colors.black, blurRadius: 3.w),
+      Shadow(color: Colors.black, blurRadius: 3.w)
+    ]);
+
+final _regular = TextPaint(style: _regularTextStyle);
 
 //total 15 money multipliers
 final moneyMultiplier = [
@@ -142,23 +152,22 @@ final moneyMultiplier = [
   2.5,
 ];
 
-
 //total 15 colors
-const moneyMultiplierColors = [
+const moneyMultiplierAsset = [
   // Add this const
-  Color(0xfff94440),
-  Color(0xfff94159),
-  Color(0xfff3722c),
-  Color(0xfff8961e),
-  Color(0xff43aa8b),
-  Color(0xff90be6d),
-  Color(0xff90be9e),
-  Color(0xfff9c74f),
-  Color(0xff90be9e),
-  Color(0xff90be6d),
-  Color(0xff43aa8b),
-  Color(0xfff8961e),
-  Color(0xfff3722c),
-  Color(0xfff94159),
-  Color(0xfff94440),
+  "bucket7.png",
+  "bucket6.png",
+  "bucket5.png",
+  "bucket4.png",
+  "bucket3.png",
+  "bucket2.png",
+  "bucket1.png",
+  "bucket0.png",
+  "bucket1.png",
+  "bucket2.png",
+  "bucket3.png",
+  "bucket4.png",
+  "bucket5.png",
+  "bucket6.png",
+  "bucket7.png",
 ];

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:plinko_forge2d/src/widgets/outlined_text.dart';
 
 class OverlayScreen extends StatelessWidget {
   const OverlayScreen({
@@ -34,16 +35,14 @@ class OverlayScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: color, fontSize: titleFontSize),
+            OutlinedText(
+             text: title,
+              align: TextAlign.center,
             ).animate().slideY(duration: 750.ms, begin: -3, end: 0),
             const SizedBox(height: 16),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: color, fontSize: subtitleFontSize),
+            OutlinedText(
+              text: subtitle,
+              align: TextAlign.center,
             )
                 .animate(onPlay: (controller) => controller.repeat())
                 .fadeIn(duration: 1.seconds)

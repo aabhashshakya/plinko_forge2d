@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame/game.dart';
 import 'package:flame_forge2d/body_component.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
+import 'package:plinko_forge2d/src/utils/extensions.dart';
 
-import '../../../config.dart';
+import '../../../constants/config.dart';
 
 class Obstacle extends BodyComponent with ContactCallbacks {
   Obstacle({
@@ -12,14 +16,24 @@ class Obstacle extends BodyComponent with ContactCallbacks {
     required this.column,
     required this.position,
   }) : super(
-    paint: Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill,
-  );
+            paint: Paint()
+              ..color = Colors.white
+              ..style = PaintingStyle.fill,
+          );
 
+  @override
   final Vector2 position;
   final int row;
   final int column;
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    var sprite = await Sprite.load("obstacle.png");
+    var size = Vector2(35, 35).zoomAdapted();
+    var s = SpriteComponent(sprite: sprite, size: size,anchor: Anchor.center);
+    add(s);
+  }
 
   @override
   Body createBody() {
@@ -31,7 +45,7 @@ class Obstacle extends BodyComponent with ContactCallbacks {
       ..restitution = 0.0; // Bouncy effect //0.0 means no bounce
 
     final bodyDef = BodyDef()
-    ..userData=this
+      ..userData = this
       ..position =
           position // Body's center of mass position, basically Anchor.Center
       ..type = BodyType.static; //cannot move and react to contact
