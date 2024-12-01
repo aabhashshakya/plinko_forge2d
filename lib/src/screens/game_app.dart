@@ -170,7 +170,8 @@ class _GameAppState extends State<GameApp> {
                                                 builder: (ctx) {
                                                   return Dialog(
                                                     child: PauseMenu(
-                                                        onResumeTapped: () {},
+                                                        onResumeTapped: () {
+                                                        },
                                                         onVolumeTapped:
                                                             (isSoundEnabled) {},
                                                         onExitGameTapped: () {
@@ -381,55 +382,56 @@ class _GameAppState extends State<GameApp> {
                                           }
                                         });
                                   }),
-                              MaterialButton(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16.h)),
-                                minWidth: 0,
-                                padding: EdgeInsets.all(0.0.w),
-                                textColor: Colors.white,
-                                elevation: 16.0.h,
-                                child: Container(
-                                  margin: EdgeInsets.zero,
-                                  padding: EdgeInsets.zero,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16.h),
-                                    image: const DecorationImage(
-                                        image:
-                                            AssetImage('assets/images/bg.jpeg'),
-                                        fit: BoxFit.cover),
-                                  ),
-                                  child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16.0.w, vertical: 8.0.h),
-                                      child: ValueListenableBuilder<PlayState>(
-                                        valueListenable: plinko.playState,
-                                        builder: (context, state, child) {
-                                          return Text(
-                                            "SIM",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12.sp,
-                                                color: Colors.white),
-                                          );
-                                        },
-                                      )),
-                                ),
-                                // ),
-                                onPressed: () {
-                                  if (plinko.getPlayState() ==
-                                      PlayState.playing) {
-                                    return;
-                                  }
-                                  if (context
-                                      .read<GameProvider>()
-                                      .trySpendCredits()) {
-                                    plinko.simulateGame(
-                                        context.read<GameProvider>().roundInfo);
-                                  } else {
-                                    plinko.setPlayState(PlayState.gameOver);
-                                  }
-                                },
-                              ),
+                              SizedBox(height: 24.h)
+                              // MaterialButton(
+                              //   shape: RoundedRectangleBorder(
+                              //       borderRadius: BorderRadius.circular(16.h)),
+                              //   minWidth: 0,
+                              //   padding: EdgeInsets.all(0.0.w),
+                              //   textColor: Colors.white,
+                              //   elevation: 16.0.h,
+                              //   child: Container(
+                              //     margin: EdgeInsets.zero,
+                              //     padding: EdgeInsets.zero,
+                              //     decoration: BoxDecoration(
+                              //       borderRadius: BorderRadius.circular(16.h),
+                              //       image: const DecorationImage(
+                              //           image:
+                              //               AssetImage('assets/images/bg.jpeg'),
+                              //           fit: BoxFit.cover),
+                              //     ),
+                              //     child: Padding(
+                              //         padding: EdgeInsets.symmetric(
+                              //             horizontal: 16.0.w, vertical: 8.0.h),
+                              //         child: ValueListenableBuilder<PlayState>(
+                              //           valueListenable: plinko.playState,
+                              //           builder: (context, state, child) {
+                              //             return Text(
+                              //               "SIM",
+                              //               style: TextStyle(
+                              //                   fontWeight: FontWeight.bold,
+                              //                   fontSize: 12.sp,
+                              //                   color: Colors.white),
+                              //             );
+                              //           },
+                              //         )),
+                              //   ),
+                              //   // ),
+                              //   onPressed: () {
+                              //     if (plinko.getPlayState() ==
+                              //         PlayState.playing) {
+                              //       return;
+                              //     }
+                              //     if (context
+                              //         .read<GameProvider>()
+                              //         .trySpendCredits()) {
+                              //       plinko.simulateGame(
+                              //           context.read<GameProvider>().roundInfo);
+                              //     } else {
+                              //       plinko.setPlayState(PlayState.gameOver);
+                              //     }
+                              //   },
+                              // ),
                             ]),
                           ),
                         ),
