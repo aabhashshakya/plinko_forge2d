@@ -168,12 +168,9 @@ class _GameAppState extends State<GameApp> {
                                                   return Dialog(
                                                     child: PauseMenu(
                                                         onResumeTapped: () {
-                                                          plinko.pauseEngine();
                                                         },
                                                         onVolumeTapped:
                                                             (isSoundEnabled) {
-                                                              plinko.resumeEngine();
-
                                                             },
                                                         onExitGameTapped: () {
                                                           Navigator.of(context)
