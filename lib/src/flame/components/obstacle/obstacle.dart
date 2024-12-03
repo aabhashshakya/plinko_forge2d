@@ -13,6 +13,8 @@ import 'package:plinko_forge2d/src/utils/extensions.dart';
 import '../../../constants/config.dart';
 import '../../../constants/shared_prefs.dart';
 import '../../plinko_forge2d.dart';
+import '../ball.dart';
+import '../collision_configs.dart';
 
 class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
   Obstacle({
@@ -31,6 +33,7 @@ class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
   final int column;
   late AudioPool audioPool;
 
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -45,7 +48,14 @@ class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
     final shape = CircleShape();
     shape.radius = obstacleRadius * 0.8;
 
+
+    var filter = Filter()
+      ..categoryBits =CategoryBits.obstacles
+    //maskBits means collision will be only detected with these components
+     ..maskBits = CategoryBits.ball;
+
     final fixtureDef = FixtureDef(shape)
+    ..filter=filter
       ..density = 1.0
       ..restitution = 0.0; // Bouncy effect //0.0 means no bounce
 

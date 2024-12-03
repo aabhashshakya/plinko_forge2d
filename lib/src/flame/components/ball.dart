@@ -3,6 +3,7 @@ import 'package:flame/effects.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:plinko_forge2d/src/constants/config.dart';
+import 'package:plinko_forge2d/src/flame/components/collision_configs.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
 
 import '../plinko_forge2d.dart';
@@ -29,10 +30,11 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   bool isFirstCollision = true;
   Vector2? velocity;
 
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    if(velocity == null){
+    if (velocity == null) {
       velocity = Vector2.zero();
     }
     var sprite = await Sprite.load("ball.png");
@@ -58,7 +60,16 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
     final shape = CircleShape();
     shape.radius = ballRadius * 0.85;
 
+    var filter = Filter()
+      ..categoryBits = CategoryBits.ball
+      //maskBits means collision will be only detected with these components
+    //here the purpose to do negate the collision between balls
+      ..maskBits = CategoryBits.obstacles |
+      CategoryBits.moneyMultipliers |
+      CategoryBits.wall;
+
     final fixtureDef = FixtureDef(shape)
+    ..filter = filter
       ..density = 60
       ..restitution = 0.3;
     /**

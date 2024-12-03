@@ -15,6 +15,7 @@ import 'package:plinko_forge2d/src/utils/extensions.dart';
 import '../../constants/shared_prefs.dart';
 import 'ball.dart';
 import '../../constants/config.dart';
+import 'collision_configs.dart';
 
 class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
   MoneyMultiplier({
@@ -62,7 +63,13 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
         Vector2(size.x / 2, size.y / 2); // Half the width and height of the box
     shape.setAsBox(size.x / 2, size.y / 2, offset, 0);
 
+    var filter = Filter()
+      ..categoryBits =CategoryBits.moneyMultipliers
+    //maskBits means collision will be only detected with these components
+      ..maskBits = CategoryBits.ball;
+
     final fixtureDef = FixtureDef(shape)
+    ..filter = filter
       ..density = 0.0
       ..restitution = 0.0; // Bouncy effect
 

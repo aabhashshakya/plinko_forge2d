@@ -1,8 +1,10 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
+import 'package:plinko_forge2d/src/flame/components/collision_configs.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
 
 import '../plinko_forge2d.dart';
+import 'ball.dart';
 
 class Wall extends BodyComponent<Plinko> with ContactCallbacks {
   @override
@@ -25,11 +27,20 @@ class Wall extends BodyComponent<Plinko> with ContactCallbacks {
       ..position = position
       ..type = BodyType.static;  // Static body, it doesn't move
 
+    var filter = Filter()
+      ..categoryBits = CategoryBits.wall
+    //maskBits means collision will be only detected with these components
+      ..maskBits = CategoryBits.ball;
+
+    final fixtureDef = FixtureDef(shape)
+      ..filter = filter;
+       //
+
     // Create the body in the world
     final body = world.createBody(bodyDef);
 
     // Create a fixture to attach the shape to the body
-    body.createFixtureFromShape(shape);
+    body.createFixture(fixtureDef);
 
     return body;
   }
