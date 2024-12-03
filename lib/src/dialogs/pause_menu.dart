@@ -56,13 +56,13 @@ class _PauseMenuState extends State<PauseMenu> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconTextButton(
-                        icon: "assets/images/resume.png",
-                        text: "RESUME",
-                        onTap: () {
-                          widget.onResumeTapped();
-                        }),
-                    SizedBox(height: 8.h),
+                    // IconTextButton(
+                    //     icon: "assets/images/resume.png",
+                    //     text: "RESUME",
+                    //     onTap: () {
+                    //       widget.onResumeTapped();
+                    //     }),
+                    // SizedBox(height: 8.h),
                     IconTextButton(
                         icon: isSoundEnabled
                             ? "assets/images/volume.png"
