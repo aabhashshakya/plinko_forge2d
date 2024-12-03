@@ -12,43 +12,45 @@ import 'components.dart';
 // CircleComponent, like RectangleComponent, derives from PositionedComponent, so you can position the ball on the screen.
 // More importantly, its position can be updated.
 class Ball extends BodyComponent<Plinko> with ContactCallbacks {
-  Ball( {
+  Ball({
     this.seed,
-    required this.velocity,
+    this.velocity,
     required this.index,
     required this.ballPosition,
   }) : super(
-    paint: Paint()
-      ..color = Colors.orange
-      ..style = PaintingStyle.fill,
-      );
+          paint: Paint()
+            ..color = Colors.transparent
+            ..style = PaintingStyle.fill,
+        );
 
   final Vector2 ballPosition;
   final int? seed;
   final int index;
-  final Vector2 velocity;
+  bool isFirstCollision = true;
+  Vector2? velocity;
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    if(velocity == null){
+      velocity = Vector2.zero();
+    }
     var sprite = await Sprite.load("ball.png");
     var size = Vector2(50, 50).zoomAdapted();
-    var s = SpriteComponent(sprite: sprite, size: size,anchor: Anchor.center);
+    var s = SpriteComponent(sprite: sprite, size: size, anchor: Anchor.center);
     add(s);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-      Vector2 velocityTmp = Vector2.zero();
-      velocity.y += 20000 * dt;
-      velocityTmp
-        ..setFrom(velocity)..clamp(Vector2(-200, -10), Vector2(200, 350))
-        ..scale(dt * 1.3); //scale is speed
-
-    body.linearVelocity+=velocityTmp;
-
-
+    Vector2 velocityTmp = Vector2.zero();
+    velocity!.y += 20000 * dt;
+    velocityTmp
+      ..setFrom(velocity!)
+      ..clamp(Vector2(-200, -10), Vector2(200, 350))
+      ..scale(dt * 1.3); //scale is speed
+    body.linearVelocity += velocityTmp;
   }
 
   @override
@@ -56,14 +58,16 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
     final shape = CircleShape();
     shape.radius = ballRadius * 0.85;
 
-
     final fixtureDef = FixtureDef(shape)
       ..density = 60
-      ..restitution = 0.3; // Bouncy effect
+      ..restitution = 0.3;
+    /**
+        ..restitution = 0.1; // Bouncy effect
+     **/
 
     final bodyDef = BodyDef()
       ..userData = this
-      ..linearVelocity =velocity
+      ..linearVelocity = velocity!
       ..position =
           ballPosition // Body's center of mass position, basically Anchor.Center
       ..type = BodyType.dynamic; //can move and react to contact
@@ -98,12 +102,23 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
         game.setPlayState(PlayState.roundOver);
       }
       add(RemoveEffect(
-        // Modify from here...
+          // Modify from here...
           delay: 0,
           onComplete: () {
             // Modify from here
           }));
     }
-  }
 
+    /**
+        if (other is Obstacle) {
+        if (other.row == 0 || other.row == 1) {
+        body.fixtures[0].restitution = 0.1;
+        } else {
+        if (body.fixtures[0].restitution != 0.3) {
+        body.fixtures[0].restitution = 0.3;
+        }
+        }
+        }
+     **/
+  }
 }

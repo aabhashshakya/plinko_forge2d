@@ -12,14 +12,14 @@ class SoundManager {
   //call only once in main()
   static Future<void> init() async {
     _collisionPool = await FlameAudio.createPool('bounce.mp3',
-        minPlayers: 3, maxPlayers: 100);
+        maxPlayers: 3);
     _moneyMultiplierPool =
         await FlameAudio.createPool('win.mp3', maxPlayers: 3);
   }
 
   static void playCollisionSound() {
     if (SharedPrefs.isSoundEnabled()) {
-      var buffer = 70;
+      var buffer = 90;
       //audio player will crash if we play lots of sound at once, even soundpool
       if (DateTime.now().difference(_lastCollisionSoundPlayed).inMilliseconds > buffer) {
         _collisionPool.start(volume: 0.1);

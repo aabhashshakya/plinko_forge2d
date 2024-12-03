@@ -140,21 +140,21 @@ final _regular = TextPaint(style: _regularTextStyle);
 
 //total 15 money multipliers
 final moneyMultiplier = [
-  2.5,
-  2.0,
-  1.5,
-  1.1,
-  1.0,
-  0.8,
-  0.5,
+  58,
+  25,
+  10,
+  5,
+  2,
+  1,
+  0.7,
   0.5, //middle
-  0.5,
-  0.8,
-  1.0,
-  1.1,
-  1.5,
-  2.0,
-  2.5,
+  0.7,
+  1,
+  2,
+  5,
+  10,
+  25,
+  58,
 ];
 
 //total 15 colors

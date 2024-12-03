@@ -22,6 +22,7 @@ class WelcomeScreen extends StatelessWidget {
           Navigator.pushNamed(
             context,
             GameApp.routeName,
+            arguments: false // enable/disable simulation option
           );
         },
         child: Container(

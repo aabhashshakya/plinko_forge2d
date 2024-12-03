@@ -38,7 +38,8 @@ class Plinko extends Forge2DGame {
         );
 
 
-  // Lock game to 60fps
+  /**
+  //Lock game to 60fps
   static const double fixedTimeStep = 1 / 60;
   double accumulator = 0;
 
@@ -56,6 +57,7 @@ class Plinko extends Forge2DGame {
     // Note: Any leftover time in the accumulator will be carried to the next frame,
     // ensuring stable physics updates over time.
   }
+  **/
 
   //ball spawn logic //to pause spawning when engine is paused
   bool isSpawning = false;
@@ -75,13 +77,14 @@ class Plinko extends Forge2DGame {
     // direction as the original Vector2, but scaled down to a distance of 1. This keeps the speed of the ball consistent
     // no matter which direction the ball goes. The ball's velocity is then scaled up to be a 1/4 of the height of the game.
     // Getting these various values right involves some iteration, also known as playtesting in the industry.
-      var offset = Random().randomBetween(-40, 40);
-      if (offset >= -10 && offset <= 10) {
-        offset = (offset * Random().randomBetween(-4, 4)).toInt();
-      }
+    var random = rand.nextDouble();
+
+   /** var offset = Random().randomBetween(-35, 35); **/
+    var offset = random > 0.5 ? 40 : -40;
+
       world.add(Ball(
-        velocity: Vector2(Random().randomBetween(-5, 5).toDouble(),
-            Random().randomBetween(-10, 10).toDouble()),
+       /** velocity: Vector2(Random().randomBetween(-3, 3).toDouble(),
+            Random().randomBetween(0, 30).toDouble()), **/
         index: ballsSpawned,
         ballPosition: Vector2(width / 2 + offset, height / 4)..zoomAdapted(),
         //initial position of the ball, which s  center
@@ -89,7 +92,9 @@ class Plinko extends Forge2DGame {
     ballsSpawned++;
 
     // Schedule the next spawn
-    Future.delayed(const Duration(milliseconds: 300), _spawnBalls);
+   /** Future.delayed(const Duration(milliseconds: 350), _spawnBalls); **/
+   Future.delayed(const Duration(milliseconds: 250), _spawnBalls);
+
   }
 
   var roundInfo = RoundInfo.getDefault();
@@ -206,16 +211,16 @@ class Plinko extends Forge2DGame {
     //Adds the PlayArea to the world. The world represents the game world. It projects all of its children through the
     // CameraComponents view transformation.
 
-    createWalls(this);
     loadGame();
   }
 
   void loadGame() {
-    score.value = 0; // Add this line
-
- //   world.removeAll(world.children.query<Ball>());
+    world.removeAll(world.children.query<Ball>());
     world.removeAll(world.children.query<Obstacle>());
     world.removeAll(world.children.query<MoneyMultiplier>());
+    world.removeAll(world.children.query<Wall>());
+
+    createWalls(this);
 
     world.addAll([
       // Add from here...
