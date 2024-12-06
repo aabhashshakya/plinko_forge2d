@@ -58,7 +58,7 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   @override
   Body createBody() {
     final shape = CircleShape();
-    shape.radius = ballRadius * 0.85;
+    shape.radius = ballRadius * 0.86;
 
     var filter = Filter()
       ..categoryBits = CategoryBits.ball
@@ -66,12 +66,14 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
     //here the purpose to do negate the collision between balls
       ..maskBits = CategoryBits.obstacles |
       CategoryBits.moneyMultipliers |
-      CategoryBits.wall;
+    //  CategoryBits.ball |
+      CategoryBits.wall
+    ;
 
     final fixtureDef = FixtureDef(shape)
     ..filter = filter
       ..density = 60
-      ..restitution = 0.3;
+      ..restitution = 0.25;
     /**
         ..restitution = 0.1; // Bouncy effect
      **/
