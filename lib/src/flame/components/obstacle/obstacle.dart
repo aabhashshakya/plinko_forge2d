@@ -57,7 +57,7 @@ class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
     final fixtureDef = FixtureDef(shape)
     ..filter=filter
       ..density = 1.0
-      ..restitution = 0.0; // Bouncy effect //0.0 means no bounce
+      ..restitution = 0.3; // Bouncy effect //0.0 means no bounce
 
     final bodyDef = BodyDef()
       ..userData = this

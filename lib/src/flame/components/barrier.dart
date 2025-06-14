@@ -15,7 +15,7 @@ class Barrier extends BodyComponent with ContactCallbacks {
   Barrier({required this.start, required this.end})
       : super(
             paint: Paint()
-              ..color = Colors.blue
+              ..color = Colors.transparent
               ..style = PaintingStyle.fill);
 
   @override
@@ -40,7 +40,7 @@ class Barrier extends BodyComponent with ContactCallbacks {
 
     return body;
   }
-  
+
 }
 
 void createBarrier(Plinko plinko) {
@@ -48,11 +48,11 @@ void createBarrier(Plinko plinko) {
   var topLeftObstacle = obstacleHelper.getObstaclePosition(0, 0);
   var bottomLeftObstacle =
       obstacleHelper.getObstaclePosition(obstacleRows - 1, 0);
-  plinko.world.add(Barrier(start: topLeftObstacle, end: bottomLeftObstacle));
+  plinko.world.add(Barrier(start: topLeftObstacle!, end: bottomLeftObstacle!));
 
   var topRightObstacle =
       obstacleHelper.getObstaclePosition(0, topRowObstaclesCount-1);
   var bottomRightObstacle = obstacleHelper.getObstaclePosition(
       obstacleRows - 1, bottomRowObstaclesCount - 1);
-  plinko.world.add(Barrier(start: topRightObstacle, end: bottomRightObstacle));
+  plinko.world.add(Barrier(start: topRightObstacle!, end: bottomRightObstacle!));
 }

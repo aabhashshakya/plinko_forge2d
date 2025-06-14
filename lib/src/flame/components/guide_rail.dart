@@ -13,7 +13,7 @@ class GuideRail extends BodyComponent with ContactCallbacks {
   GuideRail({required this.index, required this.points})
       : super(
             paint: Paint()
-              ..color = Colors.red
+              ..color = Colors.transparent
               ..style = PaintingStyle.fill);
 
   @override
@@ -21,7 +21,7 @@ class GuideRail extends BodyComponent with ContactCallbacks {
     final shape = ChainShape()..createChain(points);
 
     final fixtureDef = FixtureDef(shape)
-      ..friction = 0.5
+      ..friction = 1
       ..restitution = 0.7;
 
     final bodyDef = BodyDef()

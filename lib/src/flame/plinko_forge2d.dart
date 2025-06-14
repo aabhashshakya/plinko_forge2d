@@ -9,7 +9,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:plinko_forge2d/src/flame/components/barrier.dart';
 import 'package:plinko_forge2d/src/flame/components/guide_rail.dart';
-import 'package:plinko_forge2d/src/flame/utils/spawn_balls.dart';
+import 'package:plinko_forge2d/src/flame/spawn_balls/spawn_balls.dart';
 import 'package:plinko_forge2d/src/model/round_info.dart';
 import 'package:plinko_forge2d/src/utils/always_notify_value_notifier.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
@@ -41,7 +41,7 @@ class Plinko extends Forge2DGame {
         );
 
 
-  /**
+
   //Lock game to 60fps
   static const double fixedTimeStep = 1 / 60;
   double accumulator = 0;
@@ -60,15 +60,16 @@ class Plinko extends Forge2DGame {
     // Note: Any leftover time in the accumulator will be carried to the next frame,
     // ensuring stable physics updates over time.
   }
-  **/
+
 
   //ball spawn logic //to pause spawning when engine is paused
+  var predeterminedMultiplier = 0;
   bool isSpawning = false;
   int ballsSpawned = 0; // Tracks the number of balls spawned
   void _startSpawningBalls() {
     ballsSpawned = 0; // Reset the counter when starting
     isSpawning = true;
-    spawnBalls(this);
+    spawnBalls(this,predeterminedMultiplier: predeterminedMultiplier);
   }
 
 
@@ -209,7 +210,7 @@ class Plinko extends Forge2DGame {
           Obstacle(
             row: i,
             column: j,
-            position: obstacleHelper.getObstaclePosition(i, j)..zoomAdapted(),
+            position: obstacleHelper.getObstaclePosition(i, j)!..zoomAdapted(),
           )
     ]);
 
@@ -257,7 +258,7 @@ class Plinko extends Forge2DGame {
     var bottomObstacle = obstacleHelper.getObstaclePosition(
         obstacleRows - 1, column); //-1 as index is 0 < maxRows
 
-    return Vector2(bottomObstacle.x, bottomObstacle.y + bottomPadding);
+    return Vector2(bottomObstacle!.x, bottomObstacle.y + bottomPadding);
   }
 
   Vector2 _calculateMoneyMultiplierSize() {
@@ -275,7 +276,7 @@ class Plinko extends Forge2DGame {
           resumeEngine();
           if (playState.value == PlayState.playing && ballsSpawned < roundInfo.balls) {
             isSpawning = true;
-            spawnBalls(this); // Resume spawning if the limit isn't reached
+            spawnBalls(this,predeterminedMultiplier: predeterminedMultiplier); // Resume spawning if the limit isn't reached
           }
         }
 

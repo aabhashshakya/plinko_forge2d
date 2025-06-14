@@ -35,10 +35,10 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   Future<void> onLoad() async {
     super.onLoad();
     if (velocity == null) {
-      velocity = Vector2.zero();
+      velocity = Vector2(0, 40);
     }
     var sprite = await Sprite.load("ball.png");
-    var size = Vector2(45, 45).zoomAdapted();
+    var size = Vector2(50, 50).zoomAdapted();
     var s = SpriteComponent(sprite: sprite, size: size, anchor: Anchor.center);
     add(s);
   }
@@ -47,10 +47,10 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   void update(double dt) {
     super.update(dt);
     Vector2 velocityTmp = Vector2.zero();
-    velocity!.y += 80 * dt;
+    velocity!.y += 20 * dt;
     velocityTmp
       ..setFrom(velocity!)
-      ..clamp(Vector2(-100, -150), Vector2(100, 150))
+      ..clamp(Vector2(-90, -150), Vector2(90, 100))
       ..scale(dt * 1.3); //scale is speed
     body.linearVelocity += velocityTmp;
   }
@@ -58,7 +58,7 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   @override
   Body createBody() {
     final shape = CircleShape();
-    shape.radius = ballRadius * 0.6;
+    shape.radius = ballRadius * 0.3;
 
     var filter = Filter()
       ..categoryBits = CategoryBits.ball
@@ -72,8 +72,8 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
 
     final fixtureDef = FixtureDef(shape)
       ..filter = filter
-      ..density = 10
-      ..restitution = 0.6;
+      ..density = 7.5
+      ..restitution = 0.55;
     /**
         ..restitution = 0.1; // Bouncy effect
      **/

@@ -11,8 +11,10 @@ import 'package:plinko_forge2d/src/utils/extensions.dart';
 import '../../constants/config.dart';
 import '../components/ball.dart';
 import '../plinko_forge2d.dart';
+import 'draw_guardrails/draw_diagonal_guardrails.dart';
+import 'draw_guardrails/draw_polyline_guardrails.dart';
 
-void spawnBalls(Plinko plinko) {
+void spawnBalls(Plinko plinko, {required num predeterminedMultiplier}) {
   if (!plinko.isSpawning || plinko.ballsSpawned >= plinko.roundInfo.balls)
     return;
   var world = plinko.world;
@@ -40,13 +42,13 @@ void spawnBalls(Plinko plinko) {
   )); //scale is the speed, how fast it moves
   _buildGuideRails(plinko,
       index: plinko.ballsSpawned,
-      predeterminedMultiplier: moneyMultiplier.shuffled().first);
+      predeterminedMultiplier: predeterminedMultiplier);
   plinko.ballsSpawned++;
 
   // Schedule the next spawn
   /** Future.delayed(const Duration(milliseconds: 350), _spawnBalls); **/
   Future.delayed(const Duration(milliseconds: 350), () {
-    spawnBalls(plinko);
+    spawnBalls(plinko, predeterminedMultiplier: predeterminedMultiplier);
   });
 }
 
@@ -71,81 +73,36 @@ void _buildGuideRails(Plinko plinko,
       obstacleHelper.getObstaclePosition(finalObstacleRowIndex, bucketIndex);
   var rightObstaclePosition = obstacleHelper.getObstaclePosition(
       finalObstacleRowIndex, bucketIndex + 1);
-  drawLeftDiagonalLine(plinko,
-      index: index,
-      obstaclePosition: leftObstaclePosition,
-      obstacleColumn: bucketIndex);
-  drawRightDiagonalLine(plinko,
-      index: index,
-      obstaclePosition: rightObstaclePosition,
-      obstacleColumn: bucketIndex + 1);
-}
 
-void drawLeftDiagonalLine(Plinko plinko,
-    {required int index,
-    required Vector2 obstaclePosition,
-    required int obstacleColumn}) {
-  if (obstacleColumn == 0) {
-    return;
+  if (bucketIndex < ((obstacleRows / 2).toInt() - 2)) {
+    //predetermined bucked is in far left side, where right diagonals as guiderails just wont cut it
+    drawLeftDiagonalLine(plinko,
+        index: index,
+        obstaclePosition: leftObstaclePosition!,
+        obstacleColumn: bucketIndex);
+    drawRightPolyLine(plinko,
+        index: index,
+        obstaclePosition: rightObstaclePosition!,
+        obstacleColumn: bucketIndex + 1);
+  } else if (bucketIndex > ((obstacleRows / 2).toInt() + 2)) {
+    //predetermined bucked is in far right side, where left diagonals as guiderails just wont cut it
+    drawLeftPolyLine(plinko,
+        index: index,
+        obstaclePosition: leftObstaclePosition!,
+        obstacleColumn: bucketIndex);
+    drawRightDiagonalLine(plinko,
+        index: index,
+        obstaclePosition: rightObstaclePosition!,
+        obstacleColumn: bucketIndex + 1);
+  } else {
+    //predetermined bucked in more or less in the center of the screen
+    drawLeftDiagonalLine(plinko,
+        index: index,
+        obstaclePosition: leftObstaclePosition!,
+        obstacleColumn: bucketIndex);
+    drawRightDiagonalLine(plinko,
+        index: index,
+        obstaclePosition: rightObstaclePosition!,
+        obstacleColumn: bucketIndex + 1);
   }
-  var obstacleHelper = plinko.obstacleHelper;
-// the obstacle position is the botom obstacle which is starting point to draw line
-// we need to find the endpoint of the line, that is diagonal and drwas thwought the obstcales
-  var obstacleRowIndex = obstacleRows - 1;
-  var obstacleColumnIndex = obstacleColumn;
-
-
-  debugPrint("PLINKO: GUIDERAIL: left diagonal: startLine: column: ${obstacleColumn}");
-
-
-  while (obstacleColumnIndex > 0 && obstacleRowIndex>0) {
-    obstacleRowIndex--;
-    obstacleColumnIndex--;
-  }
-
-  var actualObstacleRowIndex = max(obstacleRowIndex,
-      0);
-
-
-  debugPrint(
-      "PLINKO: GUIDERAIL: left diagonal: endLine: row: ${actualObstacleRowIndex}column: ${obstacleColumnIndex}");
-
-  var endpointPosition =
-      obstacleHelper.getObstaclePosition(actualObstacleRowIndex, obstacleColumnIndex);
-  plinko.world.add(
-      GuideRail(index: index, points: [obstaclePosition,  endpointPosition]));
-}
-
-void drawRightDiagonalLine(Plinko plinko,
-    {required int index,
-    required Vector2 obstaclePosition,
-    required int obstacleColumn}) {
-  if (obstacleColumn == bottomRowObstaclesCount - 1) {
-    return;
-  }
-  var steps = bottomRowObstaclesCount - 1 - obstacleColumn;
-  var obstacleHelper = plinko.obstacleHelper;
-// the obstacle position is the botom obstacle which is starting point to draw line
-// we need to find the endpoint of the line, that is diagonal and drwas thwought the obstcales
-  var obstacleRowIndex = obstacleRows - 1;
-  var obstacleColumnIndex = obstacleColumn;
-  debugPrint("PLINKO: GUIDERAIL: right diagonal: startLine: column: ${obstacleColumn}");
-
-  while (steps > 0) {
-    obstacleRowIndex--;
-    obstacleColumnIndex++;
-    steps--;
-  }
-  var actualObstacleRowIndex = max(obstacleRowIndex,
-      0);
-  var actualObstacleColumnIndex = min(obstacleColumnIndex,
-      obstacleHelper.getMaxObstacleColumnIndexForRow(obstacleRowIndex));
-
-  debugPrint(
-      "PLINKO: GUIDERAIL: right diagonal: endLine: row: ${actualObstacleRowIndex}column: ${actualObstacleColumnIndex}");
-
-  var endpointPosition = obstacleHelper.getObstaclePosition(
-      actualObstacleRowIndex, actualObstacleColumnIndex);
-  plinko.world.add(
-      GuideRail(index: index, points:[obstaclePosition, endpointPosition]));
 }

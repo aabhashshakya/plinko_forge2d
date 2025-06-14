@@ -23,6 +23,7 @@ import '../constants/config.dart';
 import '../constants/shared_prefs.dart';
 import '../flame/components/money_multiplier.dart';
 import '../flame/plinko_forge2d.dart';
+import '../widgets/blurred_drop_down.dart';
 import '../widgets/game_widgets/overlay_screen.dart';
 
 //Most content in this file follows a standard Flutter widget tree build. The parts specific to Flame include using
@@ -218,12 +219,32 @@ class _GameAppState extends State<GameApp> {
                                           .watch<GameProvider>()
                                           .roundInfo
                                           .totalWinnings),
-                                  BetIndicator(
-                                      title: "Your Bet",
-                                      value: context
-                                          .watch<GameProvider>()
-                                          .totalBet
-                                          .toInt())
+                                  Column(
+                                    children: [
+                                      BetIndicator(
+                                          title: "Your Bet",
+                                          value: context
+                                              .watch<GameProvider>()
+                                              .totalBet
+                                              .toInt()),
+                                      const SizedBox(height: 20),
+                                      BlurredDropdown(
+                                          blurRadius: 3,
+                                          alignment: BlurredDropdownMenuAlignment.left,
+                                          menuItemBlurRadius: 2,
+                                          matchDropDownMenuWidth: false,
+                                          dropdownItems:
+                                          moneyMultiplier.toSet().map((num multiplier) {
+                                            return BlurredDropdownItem(
+                                                value: multiplier, displayName: "$multiplier x");
+                                          }).toList(),
+                                          initialSelectedItem: 0,
+                                          backgroundColor: const Color(0xff2F3B67).withOpacity(0.8),
+                                          onSelectionChanged: (value) {
+                                            plinko.predeterminedMultiplier = value;
+                                          }),
+                                    ],
+                                  )
                                 ],
                               ),
                               SizedBox(height: 10.h),
