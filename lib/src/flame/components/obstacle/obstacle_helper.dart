@@ -47,6 +47,10 @@ class ObstacleHelper {
     return _position["$row$column"]!;
   }
 
+  int getMaxObstacleColumnIndexForRow(int rowIndex){
+    return rowIndex + topRowObstaclesCount -1;
+  }
+
   void _reset() {
     _lastObstaclePosition = null;
     _firstObstaclePosition = null;

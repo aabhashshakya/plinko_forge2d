@@ -5,10 +5,13 @@ class CategoryBits{
   CategoryBits._();
   //used to identify this fixture and help to avoid/accept them in collision
   //Typically, you start from the least significant bit and assign each object type a power of 2.
-  static int ball = 0x0001; // 	0001
-  static int obstacles = 0x0002; // 0010
-  static int moneyMultipliers = 0x0004; //0100
-  static int wall = 0x0008; //1000
+  static int ball = 0x0001; // 	0001 //1
+  static int obstacles = 0x0002; // 0010 //2
+  static int moneyMultipliers = 0x0004; //0100 //4
+  static int wall = 0x0008; //1000 //8
+  static int guideRails = 0x0010; //0001 0000 //16
+
+
 
   // When you use powers of 2, bitwise operations (|, &) become highly efficient for combining or checking categories:
   //

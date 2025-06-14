@@ -4,6 +4,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:plinko_forge2d/src/constants/config.dart';
 import 'package:plinko_forge2d/src/flame/components/collision_configs.dart';
+import 'package:plinko_forge2d/src/flame/components/guide_rail.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
 
 import '../plinko_forge2d.dart';
@@ -30,7 +31,6 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   bool isFirstCollision = true;
   Vector2? velocity;
 
-
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -38,7 +38,7 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
       velocity = Vector2.zero();
     }
     var sprite = await Sprite.load("ball.png");
-    var size = Vector2(50, 50).zoomAdapted();
+    var size = Vector2(45, 45).zoomAdapted();
     var s = SpriteComponent(sprite: sprite, size: size, anchor: Anchor.center);
     add(s);
   }
@@ -47,10 +47,10 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   void update(double dt) {
     super.update(dt);
     Vector2 velocityTmp = Vector2.zero();
-    velocity!.y += 20000 * dt;
+    velocity!.y += 80 * dt;
     velocityTmp
       ..setFrom(velocity!)
-      ..clamp(Vector2(-200, -10), Vector2(200, 350))
+      ..clamp(Vector2(-100, -150), Vector2(100, 150))
       ..scale(dt * 1.3); //scale is speed
     body.linearVelocity += velocityTmp;
   }
@@ -58,22 +58,22 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   @override
   Body createBody() {
     final shape = CircleShape();
-    shape.radius = ballRadius * 0.86;
+    shape.radius = ballRadius * 0.6;
 
     var filter = Filter()
       ..categoryBits = CategoryBits.ball
       //maskBits means collision will be only detected with these components
-    //here the purpose to do negate the collision between balls
+      //here the purpose to do negate the collision between balls
       ..maskBits = CategoryBits.obstacles |
-      CategoryBits.moneyMultipliers |
-    //  CategoryBits.ball |
-      CategoryBits.wall
-    ;
+          CategoryBits.moneyMultipliers |
+          //  CategoryBits.ball |
+          CategoryBits.wall |
+          CategoryBits.guideRails;
 
     final fixtureDef = FixtureDef(shape)
-    ..filter = filter
-      ..density = 60
-      ..restitution = 0.25;
+      ..filter = filter
+      ..density = 10
+      ..restitution = 0.6;
     /**
         ..restitution = 0.1; // Bouncy effect
      **/
@@ -96,30 +96,52 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   }
 
   @override
+  void preSolve(Object other, Contact contact, Manifold oldManifold) {
+    if (other is GuideRail) {
+      final GuideRail guideRail = other;
+      if (guideRail.index != index) {
+        contact.isEnabled = false;
+      }
+    }
+  }
+
+  @override
   void beginContact(Object other, Contact contact) {
-    // TODO: implement beginContact
     super.beginContact(other, contact);
     if (other is Wall) {
       //game is over if ball goes out of play area
-      game.activeBalls--;
-      if (game.roundInfo.isSimulation) {
-        //add result to CSV file
-        var result = [
-          index.toString(), //S.N
-          "-1" //result
-        ];
-        game.simulationResult.add(result);
-      }
-      if (game.activeBalls <= 0) {
-        //round over if it was the last ball
-        game.setPlayState(PlayState.roundOver);
-      }
-      add(RemoveEffect(
-          // Modify from here...
-          delay: 0,
-          onComplete: () {
-            // Modify from here
-          }));
+      Future.microtask(() {
+        //remove the guiderails for the ball
+        final guideRailsToRemove = game.world.children
+            .whereType<GuideRail>()
+            .where((guide) => guide.index == index)
+            .toList();
+        for (final guide in guideRailsToRemove) {
+          world.destroyBody(guide.body);
+          guide.removeFromParent();
+        }
+        world.destroyBody(body);
+        removeFromParent();
+        game.activeBalls--;
+        if (game.roundInfo.isSimulation) {
+          //add result to CSV file
+          var result = [
+            index.toString(), //S.N
+            "-1" //result
+          ];
+          game.simulationResult.add(result);
+        }
+        if (game.activeBalls <= 0) {
+          //round over if it was the last ball
+          game.setPlayState(PlayState.roundOver);
+        }
+        add(RemoveEffect(
+            // Modify from here...
+            delay: 0,
+            onComplete: () {
+              // Modify from here
+            }));
+      });
     }
 
     /**

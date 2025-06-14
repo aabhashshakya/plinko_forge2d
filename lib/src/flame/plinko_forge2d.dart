@@ -7,6 +7,9 @@ import 'package:collection/collection.dart';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
+import 'package:plinko_forge2d/src/flame/components/barrier.dart';
+import 'package:plinko_forge2d/src/flame/components/guide_rail.dart';
+import 'package:plinko_forge2d/src/flame/utils/spawn_balls.dart';
 import 'package:plinko_forge2d/src/model/round_info.dart';
 import 'package:plinko_forge2d/src/utils/always_notify_value_notifier.dart';
 import 'package:plinko_forge2d/src/utils/extensions.dart';
@@ -65,37 +68,9 @@ class Plinko extends Forge2DGame {
   void _startSpawningBalls() {
     ballsSpawned = 0; // Reset the counter when starting
     isSpawning = true;
-    _spawnBalls();
+    spawnBalls(this);
   }
-  void _spawnBalls() {
-    if (!isSpawning || ballsSpawned >= roundInfo.balls) return;
-    //This change adds the Ball component to the world. To set the ball's position to the center of the display area,
-    // the code first halves the size of the game, as Vector2 has operator overloads (* and /) to scale a Vector2 by a
-    // scalar value.
-    // To set the ball's velocity involves more complexity. The intent is to move the ball down the screen in a random
-    // direction at a reasonable speed. The call to the normalized method creates a Vector2 object set to the same
-    // direction as the original Vector2, but scaled down to a distance of 1. This keeps the speed of the ball consistent
-    // no matter which direction the ball goes. The ball's velocity is then scaled up to be a 1/4 of the height of the game.
-    // Getting these various values right involves some iteration, also known as playtesting in the industry.
-    var random = rand.nextDouble();
 
-   /** var offset = Random().randomBetween(-35, 35); **/
-    var offset = random > 0.5 ? 40 : -40;
-
-      world.add(Ball(
-       /** velocity: Vector2(Random().randomBetween(-3, 3).toDouble(),
-            Random().randomBetween(0, 30).toDouble()), **/
-        index: ballsSpawned,
-        ballPosition: Vector2(width / 2 + offset, height / 4)..zoomAdapted(),
-        //initial position of the ball, which s  center
-      )); //scale is the speed, how fast it moves
-    ballsSpawned++;
-
-    // Schedule the next spawn
-   /** Future.delayed(const Duration(milliseconds: 350), _spawnBalls); **/
-   Future.delayed(const Duration(milliseconds: 250), _spawnBalls);
-
-  }
 
   var roundInfo = RoundInfo.getDefault();
   var activeBalls = minBalls;
@@ -216,11 +191,14 @@ class Plinko extends Forge2DGame {
 
   void loadGame() {
     world.removeAll(world.children.query<Ball>());
+    world.removeAll(world.children.query<Barrier>());
+    world.removeAll(world.children.query<GuideRail>());
     world.removeAll(world.children.query<Obstacle>());
     world.removeAll(world.children.query<MoneyMultiplier>());
     world.removeAll(world.children.query<Wall>());
 
     createWalls(this);
+    createBarrier(this);
 
     world.addAll([
       // Add from here...
@@ -297,7 +275,7 @@ class Plinko extends Forge2DGame {
           resumeEngine();
           if (playState.value == PlayState.playing && ballsSpawned < roundInfo.balls) {
             isSpawning = true;
-            _spawnBalls(); // Resume spawning if the limit isn't reached
+            spawnBalls(this); // Resume spawning if the limit isn't reached
           }
         }
 

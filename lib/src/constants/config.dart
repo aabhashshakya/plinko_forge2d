@@ -13,6 +13,7 @@ const ballRadius = (gameWidth * 0.020)/zoom;
 const obstacleRows = 14;
 const obstacleDistance = 55;
 const topRowObstaclesCount = 3;
+const bottomRowObstaclesCount = obstacleRows + topRowObstaclesCount -1;
 const obstacleRadius = ballRadius * 0.525;
 const obstacleGutter = gameWidth * 0.022;
 
@@ -20,7 +21,7 @@ const obstacleGutter = gameWidth * 0.022;
 const minBet = 10;
 const maxBet = 10000;
 const minBalls =1;
-const maxBalls = 10;
+const maxBalls = 100;
 const defaultCredit = 99999;
 
 

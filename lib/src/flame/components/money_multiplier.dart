@@ -16,6 +16,7 @@ import '../../constants/shared_prefs.dart';
 import 'ball.dart';
 import '../../constants/config.dart';
 import 'collision_configs.dart';
+import 'guide_rail.dart';
 
 class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
   MoneyMultiplier({
@@ -64,12 +65,12 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
     shape.setAsBox(size.x / 2, size.y / 2, offset, 0);
 
     var filter = Filter()
-      ..categoryBits =CategoryBits.moneyMultipliers
-    //maskBits means collision will be only detected with these components
+      ..categoryBits = CategoryBits.moneyMultipliers
+      //maskBits means collision will be only detected with these components
       ..maskBits = CategoryBits.ball;
 
     final fixtureDef = FixtureDef(shape)
-    ..filter = filter
+      ..filter = filter
       ..density = 0.0
       ..restitution = 0.0; // Bouncy effect
 
@@ -96,24 +97,42 @@ class MoneyMultiplier extends BodyComponent<Plinko> with ContactCallbacks {
     if (ball.isRemoved || ball.isRemoving) {
       return;
     }
-    ball.removeFromParent();
-    game.activeBalls--;
-    game.score.value = multiplier.toDouble();
-    game.gameResults.value = [...game.gameResults.value, this];
-    if (game.roundInfo.isSimulation) {
-      //add result to CSV file
-      var result = [
-        ball.index.toString(), //S.N
-        "${multiplier}x",
-        column.toString()
-        //result
-      ];
-      game.simulationResult.add(result);
-    }
 
-    if (game.activeBalls <= 0) {
-      game.setPlayState(PlayState.roundOver);
-    }
+    //remove the ball n and guide
+    Future.microtask(() {
+      //remove the guiderails for the ball
+      final guideRailsToRemove = game.world.children
+          .whereType<GuideRail>()
+          .where((guide) => guide.index == ball.index)
+          .toList();
+      for (final guide in guideRailsToRemove) {
+        world.destroyBody(guide.body);
+        guide.removeFromParent();
+      }
+      world.destroyBody(ball.body);
+      ball.removeFromParent();
+
+      game.activeBalls--;
+      game.score.value = multiplier.toDouble();
+      game.gameResults.value = [...game.gameResults.value, this];
+
+      //write data if simulation
+      if (game.roundInfo.isSimulation) {
+        //add result to CSV file
+        var result = [
+          ball.index.toString(), //S.N
+          "${multiplier}x",
+          column.toString()
+          //result
+        ];
+        game.simulationResult.add(result);
+      }
+
+      if (game.activeBalls <= 0) {
+        game.setPlayState(PlayState.roundOver);
+      }
+    });
+
 
     //win condition
     //The most important new concept this code introduces is how the player achieves the win condition. The win condition

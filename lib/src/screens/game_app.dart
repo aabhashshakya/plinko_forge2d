@@ -107,34 +107,32 @@ class _GameAppState extends State<GameApp> {
                     const BorderRadius.only(topLeft: Radius.circular(1.0)),
                 child: Stack(
                   children: [
-                    Expanded(
-                      child: FittedBox(
-                        child: SizedBox(
-                          width: gameWidth,
-                          height: gameHeight,
-                          child: GameWidget(
-                            game: plinko,
-                            overlayBuilderMap: {
-                              PlayState.roundOver.name: (context, game) {
-                                SoundManager.playWinSound();
-                                return Container();
-                              },
-                              PlayState.gameOver.name: (context, game) {
-                                SoundManager.playLoseSound();
-                                return OverlayScreen(
-                                  color: Colors.red,
-                                  title: 'N O   C R E D I T S',
-                                  subtitle:
-                                      'You need ${context.read<GameProvider>().calculateMissingCredits()} more credits!',
-                                  onTap: () {
-                                    plinko.setPlayState(PlayState.ready);
-                                    plinko.overlays
-                                        .remove(PlayState.gameOver.name);
-                                  },
-                                );
-                              },
+                    FittedBox(
+                      child: SizedBox(
+                        width: gameWidth,
+                        height: gameHeight,
+                        child: GameWidget(
+                          game: plinko,
+                          overlayBuilderMap: {
+                            PlayState.roundOver.name: (context, game) {
+                              SoundManager.playWinSound();
+                              return Container();
                             },
-                          ),
+                            PlayState.gameOver.name: (context, game) {
+                              SoundManager.playLoseSound();
+                              return OverlayScreen(
+                                color: Colors.red,
+                                title: 'N O   C R E D I T S',
+                                subtitle:
+                                    'You need ${context.read<GameProvider>().calculateMissingCredits()} more credits!',
+                                onTap: () {
+                                  plinko.setPlayState(PlayState.ready);
+                                  plinko.overlays
+                                      .remove(PlayState.gameOver.name);
+                                },
+                              );
+                            },
+                          },
                         ),
                       ),
                     ),
