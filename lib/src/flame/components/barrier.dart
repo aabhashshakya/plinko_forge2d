@@ -40,23 +40,7 @@ class Barrier extends BodyComponent with ContactCallbacks {
 
     return body;
   }
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
-    final paint = Paint()
-      ..color = Colors.transparent
-      ..strokeWidth = 0.1
-      ..style = PaintingStyle.stroke;
-
-    // Draw the line between start and end, relative to body's position (which is 0,0 here)
-    canvas.drawLine(
-      Offset(start.x, start.y),
-      Offset(end.x, end.y),
-      paint,
-    );
-  }
+  
 }
 
 void createBarrier(Plinko plinko) {

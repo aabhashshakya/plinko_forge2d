@@ -113,7 +113,7 @@ void drawLeftDiagonalLine(Plinko plinko,
   var endpointPosition =
       obstacleHelper.getObstaclePosition(actualObstacleRowIndex, obstacleColumnIndex);
   plinko.world.add(
-      GuideRail(index: index, start: obstaclePosition, end: endpointPosition));
+      GuideRail(index: index, points: [obstaclePosition,  endpointPosition]));
 }
 
 void drawRightDiagonalLine(Plinko plinko,
@@ -147,5 +147,5 @@ void drawRightDiagonalLine(Plinko plinko,
   var endpointPosition = obstacleHelper.getObstaclePosition(
       actualObstacleRowIndex, actualObstacleColumnIndex);
   plinko.world.add(
-      GuideRail(index: index, start: obstaclePosition, end: endpointPosition));
+      GuideRail(index: index, points:[obstaclePosition, endpointPosition]));
 }

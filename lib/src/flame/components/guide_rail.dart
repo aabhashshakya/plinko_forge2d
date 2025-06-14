@@ -7,10 +7,10 @@ import 'collision_configs.dart';
 
 class GuideRail extends BodyComponent with ContactCallbacks {
   final int index;
-  final Vector2 start;
-  final Vector2 end;
+  final List<Vector2> points;
 
-  GuideRail({required this.index, required this.start, required this.end})
+
+  GuideRail({required this.index, required this.points})
       : super(
             paint: Paint()
               ..color = Colors.red
@@ -18,7 +18,7 @@ class GuideRail extends BodyComponent with ContactCallbacks {
 
   @override
   Body createBody() {
-    final shape = EdgeShape()..set(start, end);
+    final shape = ChainShape()..createChain(points);
 
     final fixtureDef = FixtureDef(shape)
       ..friction = 0.5
@@ -42,20 +42,20 @@ class GuideRail extends BodyComponent with ContactCallbacks {
 
 
 
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-
-    final paint = Paint()
-      ..color = Colors.transparent
-      ..strokeWidth = 0.1
-      ..style = PaintingStyle.stroke;
-
-    // Draw the line between start and end, relative to body's position (which is 0,0 here)
-    canvas.drawLine(
-      Offset(start.x, start.y),
-      Offset(end.x, end.y),
-      paint,
-    );
-  }
+  // @override
+  // void render(Canvas canvas) {
+  //   super.render(canvas);
+  //
+  //   final paint = Paint()
+  //     ..color = Colors.transparent
+  //     ..strokeWidth = 0.1
+  //     ..style = PaintingStyle.stroke;
+  //
+  //   // Draw the line between start and end, relative to body's position (which is 0,0 here)
+  //   canvas.drawLine(
+  //     Offset(start.x, start.y),
+  //     Offset(end.x, end.y),
+  //     paint,
+  //   );
+  // }
 }
