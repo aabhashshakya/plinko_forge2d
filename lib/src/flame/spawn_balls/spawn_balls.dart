@@ -45,8 +45,8 @@ void spawnBalls(Plinko plinko, {required num predeterminedMultiplier}) {
   // Getting these various values right involves some iteration, also known as playtesting in the industry.
   int offset;
   do {
-    offset = Random().nextInt(71) - 35; // Range: -35 to 35
-  } while (offset >= -10 && offset <= 10);
+    offset = Random().nextInt(81) - 40; // Range: -40 to 40
+  } while (offset >= -15 && offset <= 15);
 
   world.add(Ball(
     predeterminedBucketIndex: bucketIndex,

@@ -33,12 +33,11 @@ class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
   final int column;
   late AudioPool audioPool;
 
-
   @override
   Future<void> onLoad() async {
     super.onLoad();
     var sprite = await Sprite.load("obstacle.png");
-    var size = Vector2(35, 35).zoomAdapted();
+    var size = Vector2(40, 40).zoomAdapted();
     var s = SpriteComponent(sprite: sprite, size: size, anchor: Anchor.center);
     add(s);
   }
@@ -48,14 +47,14 @@ class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
     final shape = CircleShape();
     shape.radius = obstacleRadius;
 
-
     var filter = Filter()
-      ..categoryBits =CategoryBits.obstacles
-    //maskBits means collision will be only detected with these components
-     ..maskBits = CategoryBits.ball;
+      ..categoryBits = CategoryBits.obstacles
+      //maskBits means collision will be only detected with these components
+      ..maskBits = CategoryBits.ball;
 
     final fixtureDef = FixtureDef(shape)
-    ..filter=filter
+      ..filter = filter
+      ..friction=0.1
       ..density = 1.0
       ..restitution = 0.3; // Bouncy effect //0.0 means no bounce
 
@@ -74,7 +73,6 @@ class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
   void beginContact(Object other, Contact contact) {
     // TODO: implement beginContact
     super.beginContact(other, contact);
-    SoundManager.playCollisionSound();
 
     final colorEffect = ColorEffect(
       const Color(0xffB59410),
@@ -82,11 +80,14 @@ class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
       opacityFrom: 0,
       opacityTo: 1,
     );
+    addCollisionEffect();
+  }
+
+  void addCollisionEffect() {
+    SoundManager.playCollisionSound();
     final effect = GlowEffect(
         50, EffectController(duration: 0.5, reverseDuration: 0),
         style: BlurStyle.solid);
-    // add(colorEffect);
     add(effect);
   }
-
 }

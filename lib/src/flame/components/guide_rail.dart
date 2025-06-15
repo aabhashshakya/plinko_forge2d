@@ -25,7 +25,7 @@ class GuideRail extends BodyComponent with ContactCallbacks {
     final shape = ChainShape()..createChain(points);
 
     final fixtureDef = FixtureDef(shape)
-      ..friction = 1
+      ..friction = 0
       ..restitution = 0.7;
 
     final bodyDef = BodyDef()

@@ -8,6 +8,7 @@ import '../../../constants/config.dart';
 import '../../components/guide_rail.dart';
 import '../../plinko_forge2d.dart';
 
+//set a color to the guard rails to see how these are drawn
 void drawLeftPolyLine(Plinko plinko,
     {required int index,
     required Vector2 obstaclePosition,
@@ -52,7 +53,6 @@ void drawRightPolyLine(Plinko plinko,
   if (obstacleColumn == bottomRowObstaclesCount - 1) {
     return;
   }
-  var steps = bottomRowObstaclesCount - 1 - obstacleColumn;
   var obstacleHelper = plinko.obstacleHelper;
 // the obstacle position is the botom obstacle which is starting point to draw line
 // we need to find the endpoint of the line, that is diagonal and drwas thwought the obstcales
@@ -62,7 +62,9 @@ void drawRightPolyLine(Plinko plinko,
     Vector2(obstaclePosition.x - 1, obstaclePosition.y + 4),
     obstaclePosition
   ];
-  while (obstacleColumnIndex > 0 && obstacleRowIndex > 0) {
+  while (obstacleColumnIndex <
+          obstacleHelper.getMaxObstacleColumnIndexForRow(obstacleRowIndex) &&
+      obstacleRowIndex > 0) {
     obstacleColumnIndex = obstacleColumnIndex + 1;
     obstacleRowIndex--;
     var newPoint = obstacleHelper.getObstaclePosition(
@@ -73,7 +75,6 @@ void drawRightPolyLine(Plinko plinko,
       points.add(newPoint);
     }
     obstacleRowIndex--;
-    obstacleColumnIndex++;
     var newerPoint = obstacleHelper.getObstaclePosition(
         obstacleRowIndex,
         min(obstacleHelper.getMaxObstacleColumnIndexForRow(obstacleRowIndex),

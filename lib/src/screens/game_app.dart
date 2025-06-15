@@ -212,6 +212,7 @@ class _GameAppState extends State<GameApp> {
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   WinningsIndicator(
                                       title: "Winnings",

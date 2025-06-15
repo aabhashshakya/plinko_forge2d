@@ -8,6 +8,7 @@ import '../../../constants/config.dart';
 import '../../components/guide_rail.dart';
 import '../../plinko_forge2d.dart';
 
+//set a color to the guard rails to see how these are drawn
 void drawLeftDiagonalLine(Plinko plinko,
     {required int index,
     required Vector2 obstaclePosition,

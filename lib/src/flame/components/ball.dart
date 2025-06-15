@@ -39,6 +39,10 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
 
   final restitution = 0.55;
 
+  double stuckThreshold = 10; // velocity magnitude below this = "stuck"
+  int stuckFrameCount = 0;
+  int stuckFrameLimit = 60; // number of frames before you consider it stuck
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -60,6 +64,21 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
       ..clamp(Vector2(-90, -150), Vector2(90, 100))
       ..scale(dt * 1.3); //scale is speed
     body.linearVelocity += velocityTmp;
+
+    debugPrint('Plinko: Linear velocity length: ${body.linearVelocity.length}');
+    if (body.linearVelocity.length < stuckThreshold) {
+      stuckFrameCount++;
+    } else {
+      stuckFrameCount = 0; // reset if ball moves
+    }
+
+    if (stuckFrameCount > stuckFrameLimit) {
+      debugPrint('Plinko: Ball is stuck!');
+      double dx = predeterminedBucketPosition.x - body.position.x;
+      final impulse =
+          Vector2(dx.sign * 50, -50); // little force in the direction of bucket
+      body.applyLinearImpulse(impulse);
+    }
   }
 
   @override
@@ -158,20 +177,30 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
       });
     }
 
-    if(other is Obstacle){
+    if (other is Obstacle) {
       // 🔽logic to slightly steer the ball toward the predetermined bucket
       double dx = predeterminedBucketPosition.x - body.position.x;
-      if (dx.abs() > 30) {
-        // only steer if not already close
-        velocity!.x += (dx.sign * 3); // nudge left or right slightly
+      if (dx.abs() > 25) {
+        // if ball's x position is too far from bucket's x position, apply some force in that direction
+        final impulse = Vector2(dx.sign * 50, -20); // Adjust as needed
+        body.applyLinearImpulse(impulse);
+      } else {
+        //apply little force in that direction anyways, just to prevent any stalls
+        final impulse = Vector2(dx.sign * 10, -20);
+        body.applyLinearImpulse(impulse);
       }
     }
 
     if (other is GuideRail) {
-      if (other.guideRailPosition == GuideRailPosition.left) {
-        velocity!.x += 3; // nudge right slightly
-      } else {
-        velocity!.x += -3; // nudge left slightly
+      if (predeterminedBucketPosition.y - position.y >
+          (moneyMultiplierSize.y / 2)) {
+        //make the collision with guiderails, extra strong on the extra direction
+        //if the ball is already close to the bucket, don't do this
+        if (other.guideRailPosition == GuideRailPosition.left) {
+          body.applyLinearImpulse(Vector2(100, -10));
+        } else {
+          body.applyLinearImpulse(Vector2(-100, -10));
+        }
       }
     }
   }
