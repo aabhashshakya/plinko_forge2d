@@ -39,7 +39,7 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
 
   final restitution = 0.55;
 
-  double stuckThreshold = 10; // velocity magnitude below this = "stuck"
+  double stuckThreshold = 15; // velocity magnitude below this = "stuck"
   int stuckFrameCount = 0;
   int stuckFrameLimit = 60; // number of frames before you consider it stuck
 
@@ -129,6 +129,9 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
         contact.isEnabled = false;
       }
     }
+    if (other is Ball) {
+      contact.isEnabled = false;
+    }
     if (other is Obstacle) {
       if (other.row == 0) {
         body.fixtures[0].restitution = 0.0;
@@ -182,7 +185,7 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
       double dx = predeterminedBucketPosition.x - body.position.x;
       if (dx.abs() > 25) {
         // if ball's x position is too far from bucket's x position, apply some force in that direction
-        final impulse = Vector2(dx.sign * 50, -20); // Adjust as needed
+        final impulse = Vector2(dx.sign * 40, -20); // Adjust as needed
         body.applyLinearImpulse(impulse);
       } else {
         //apply little force in that direction anyways, just to prevent any stalls

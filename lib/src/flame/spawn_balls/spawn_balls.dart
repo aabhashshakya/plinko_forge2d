@@ -64,7 +64,7 @@ void spawnBalls(Plinko plinko, {required num predeterminedMultiplier}) {
 
   // Schedule the next spawn
   /** Future.delayed(const Duration(milliseconds: 350), _spawnBalls); **/
-  Future.delayed(const Duration(milliseconds: 350), () {
+  Future.delayed(const Duration(milliseconds: 500), () {
     spawnBalls(plinko, predeterminedMultiplier: predeterminedMultiplier);
   });
 }
