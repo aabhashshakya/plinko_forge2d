@@ -41,7 +41,8 @@ void drawLeftPolyLine(Plinko plinko,
       points.add(newerPoint);
     }
   }
-  plinko.world.add(GuideRail(index: index, points: points));
+  plinko.world.add(GuideRail(
+      index: index, guideRailPosition: GuideRailPosition.left, points: points));
 }
 
 void drawRightPolyLine(Plinko plinko,
@@ -81,5 +82,8 @@ void drawRightPolyLine(Plinko plinko,
       points.add(newerPoint);
     }
   }
-  plinko.world.add(GuideRail(index: index, points: points));
+  plinko.world.add(GuideRail(
+      index: index,
+      guideRailPosition: GuideRailPosition.right,
+      points: points));
 }

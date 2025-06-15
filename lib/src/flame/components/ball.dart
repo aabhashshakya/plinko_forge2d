@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -14,12 +16,14 @@ import 'components.dart';
 // CircleComponent, like RectangleComponent, derives from PositionedComponent, so you can position the ball on the screen.
 // More importantly, its position can be updated.
 class Ball extends BodyComponent<Plinko> with ContactCallbacks {
-  Ball({
-    this.seed,
-    this.velocity,
-    required this.index,
-    required this.ballPosition,
-  }) : super(
+  Ball(
+      {this.seed,
+      this.velocity,
+      required this.index,
+      required this.ballPosition,
+      required this.predeterminedBucketIndex,
+      required this.predeterminedBucketPosition})
+      : super(
           paint: Paint()
             ..color = Colors.transparent
             ..style = PaintingStyle.fill,
@@ -30,13 +34,15 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   final int index;
   bool isFirstCollision = true;
   Vector2? velocity;
+  int predeterminedBucketIndex;
+  Vector2 predeterminedBucketPosition;
+
+  final restitution = 0.55;
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    if (velocity == null) {
-      velocity = Vector2(0, 40);
-    }
+    velocity ??= Vector2(0, 40);
     var sprite = await Sprite.load("ball.png");
     var size = Vector2(50, 50).zoomAdapted();
     var s = SpriteComponent(sprite: sprite, size: size, anchor: Anchor.center);
@@ -47,7 +53,8 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
   void update(double dt) {
     super.update(dt);
     Vector2 velocityTmp = Vector2.zero();
-    velocity!.y += 20 * dt;
+    velocity!.y += Random().randomBetween(15, 25) * dt;
+
     velocityTmp
       ..setFrom(velocity!)
       ..clamp(Vector2(-90, -150), Vector2(90, 100))
@@ -73,7 +80,7 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
     final fixtureDef = FixtureDef(shape)
       ..filter = filter
       ..density = 7.5
-      ..restitution = 0.55;
+      ..restitution = restitution;
     /**
         ..restitution = 0.1; // Bouncy effect
      **/
@@ -101,6 +108,13 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
       final GuideRail guideRail = other;
       if (guideRail.index != index) {
         contact.isEnabled = false;
+      }
+    }
+    if (other is Obstacle) {
+      if (other.row == 0) {
+        body.fixtures[0].restitution = 0.0;
+      } else {
+        body.fixtures[0].restitution = restitution;
       }
     }
   }
@@ -144,16 +158,21 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
       });
     }
 
-    /**
-        if (other is Obstacle) {
-        if (other.row == 0 || other.row == 1) {
-        body.fixtures[0].restitution = 0.1;
-        } else {
-        if (body.fixtures[0].restitution != 0.3) {
-        body.fixtures[0].restitution = 0.3;
-        }
-        }
-        }
-     **/
+    if(other is Obstacle){
+      // 🔽logic to slightly steer the ball toward the predetermined bucket
+      double dx = predeterminedBucketPosition.x - body.position.x;
+      if (dx.abs() > 30) {
+        // only steer if not already close
+        velocity!.x += (dx.sign * 3); // nudge left or right slightly
+      }
+    }
+
+    if (other is GuideRail) {
+      if (other.guideRailPosition == GuideRailPosition.left) {
+        velocity!.x += 3; // nudge right slightly
+      } else {
+        velocity!.x += -3; // nudge left slightly
+      }
+    }
   }
 }

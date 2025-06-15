@@ -26,7 +26,7 @@ class ObstacleHelper {
       _reset();
     }
 
-    var y = (row + 200) * (obstacleRadius * 2.7) + (row * obstacleGutter * 2.7);
+    var y = (row + 200) * (obstacleRadius * 3.375) + (row * obstacleGutter * 2.7);
     double x;
     if (column == 0) {
       if (row == 0) {

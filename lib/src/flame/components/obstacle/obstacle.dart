@@ -46,7 +46,7 @@ class Obstacle extends BodyComponent<Plinko> with ContactCallbacks {
   @override
   Body createBody() {
     final shape = CircleShape();
-    shape.radius = obstacleRadius * 0.8;
+    shape.radius = obstacleRadius;
 
 
     var filter = Filter()

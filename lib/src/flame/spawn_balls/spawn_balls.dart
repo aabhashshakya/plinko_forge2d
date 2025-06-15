@@ -10,6 +10,7 @@ import 'package:plinko_forge2d/src/utils/extensions.dart';
 
 import '../../constants/config.dart';
 import '../components/ball.dart';
+import '../components/obstacle/obstacle_helper.dart';
 import '../plinko_forge2d.dart';
 import 'draw_guardrails/draw_diagonal_guardrails.dart';
 import 'draw_guardrails/draw_polyline_guardrails.dart';
@@ -18,6 +19,21 @@ void spawnBalls(Plinko plinko, {required num predeterminedMultiplier}) {
   if (!plinko.isSpawning || plinko.ballsSpawned >= plinko.roundInfo.balls)
     return;
   var world = plinko.world;
+  //get the indexes of the bucket that match the money multiplier
+  final bucketIndexes = moneyMultiplier
+      .asMap()
+      .entries
+      .where((entry) => entry.value == predeterminedMultiplier)
+      .map((entry) => entry.key)
+      .toList();
+  final bucketIndex = bucketIndexes.shuffled().first;
+  final bucketPosition = _calculateMoneyMultiplierPosition(
+      column: bucketIndex, obstacleHelper: plinko.obstacleHelper);
+
+  //get the two obstacles directly above the bucket
+  //eg:
+  // 0   0   0   0   X     X  0   0   0   0
+  // .    .   .   .  | 0x |   .   .   .   .
 
   //This change adds the Ball component to the world. To set the ball's position to the center of the display area,
   // the code first halves the size of the game, as Vector2 has operator overloads (* and /) to scale a Vector2 by a
@@ -27,22 +43,23 @@ void spawnBalls(Plinko plinko, {required num predeterminedMultiplier}) {
   // direction as the original Vector2, but scaled down to a distance of 1. This keeps the speed of the ball consistent
   // no matter which direction the ball goes. The ball's velocity is then scaled up to be a 1/4 of the height of the game.
   // Getting these various values right involves some iteration, also known as playtesting in the industry.
-  var random = Random().nextDouble();
-
-  /** var offset = Random().randomBetween(-35, 35); **/
-  var offset = random > 0.5 ? 40 : -40;
+  int offset;
+  do {
+    offset = Random().nextInt(71) - 35; // Range: -35 to 35
+  } while (offset >= -10 && offset <= 10);
 
   world.add(Ball(
-    /** velocity: Vector2(Random().randomBetween(-3, 3).toDouble(),
-        Random().randomBetween(0, 30).toDouble()), **/
+    predeterminedBucketIndex: bucketIndex,
+    predeterminedBucketPosition: bucketPosition,
+    velocity: Vector2(Random().randomBetween(-3, 3).toDouble(),
+        Random().randomBetween(30, 45).toDouble()),
     index: plinko.ballsSpawned,
     ballPosition: Vector2(plinko.width / 2 + offset, plinko.height / 4)
       ..zoomAdapted(),
     //initial position of the ball, which s  center
   )); //scale is the speed, how fast it moves
   _buildGuideRails(plinko,
-      index: plinko.ballsSpawned,
-      predeterminedMultiplier: predeterminedMultiplier);
+      index: plinko.ballsSpawned, bucketIndex: bucketIndex);
   plinko.ballsSpawned++;
 
   // Schedule the next spawn
@@ -53,21 +70,8 @@ void spawnBalls(Plinko plinko, {required num predeterminedMultiplier}) {
 }
 
 void _buildGuideRails(Plinko plinko,
-    {required int index, required num predeterminedMultiplier}) {
+    {required int index, required int bucketIndex}) {
   var obstacleHelper = plinko.obstacleHelper;
-  //get the indexes of the bucket that match the money multiplier
-  final bucketIndexes = moneyMultiplier
-      .asMap()
-      .entries
-      .where((entry) => entry.value == predeterminedMultiplier)
-      .map((entry) => entry.key)
-      .toList();
-  final bucketIndex = bucketIndexes.shuffled().first;
-
-  //get the two obstacles directly above the bucket
-  //eg:
-  // 0   0   0   0   X     X  0   0   0   0
-  // .    .   .   .  | 0x |   .   .   .   .
   int finalObstacleRowIndex = obstacleRows - 1;
   var leftObstaclePosition =
       obstacleHelper.getObstaclePosition(finalObstacleRowIndex, bucketIndex);
@@ -105,4 +109,13 @@ void _buildGuideRails(Plinko plinko,
         obstaclePosition: rightObstaclePosition!,
         obstacleColumn: bucketIndex + 1);
   }
+}
+
+Vector2 _calculateMoneyMultiplierPosition(
+    {required int column, required ObstacleHelper obstacleHelper}) {
+  var bottomPadding = 30 / zoom;
+  var bottomObstacle = obstacleHelper.getObstaclePosition(
+      obstacleRows - 1, column); //-1 as index is 0 < maxRows
+
+  return Vector2(bottomObstacle!.x, bottomObstacle.y + bottomPadding);
 }

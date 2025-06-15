@@ -222,7 +222,7 @@ class Plinko extends Forge2DGame {
             column: i,
             cornerRadius: const Radius.circular(12),
             multiplierPosition: _calculateMoneyMultiplierPosition(i),
-            size: _calculateMoneyMultiplierSize())
+            size: moneyMultiplierSize)
     ]);
   }
 
@@ -259,12 +259,6 @@ class Plinko extends Forge2DGame {
         obstacleRows - 1, column); //-1 as index is 0 < maxRows
 
     return Vector2(bottomObstacle!.x, bottomObstacle.y + bottomPadding);
-  }
-
-  Vector2 _calculateMoneyMultiplierSize() {
-    var height = 95.0;
-    var width = obstacleDistance.toDouble() + 5;
-    return Vector2(width, height)..zoomAdapted();
   }
 
   @override
