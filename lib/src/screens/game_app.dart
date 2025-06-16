@@ -242,7 +242,7 @@ class _GameAppState extends State<GameApp> {
                                           initialSelectedItem: 0,
                                           backgroundColor: const Color(0xff2F3B67).withOpacity(0.8),
                                           onSelectionChanged: (value) {
-                                            plinko.predeterminedMultiplier = value;
+                                            plinko.predeterminedMultiplier = double.parse(value.toString());
                                           }),
                                     ],
                                   )

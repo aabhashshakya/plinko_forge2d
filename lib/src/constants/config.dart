@@ -22,7 +22,7 @@ const obstacleGutter = gameWidth * 0.022;
 const minBet = 10;
 const maxBet = 10000;
 const minBalls = 1;
-const maxBalls = 50;
+const maxBalls = 100;
 const defaultCredit = 99999;
 
 //money multiplier

@@ -185,7 +185,7 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
       double dx = predeterminedBucketPosition.x - body.position.x;
       if (dx.abs() > 25) {
         // if ball's x position is too far from bucket's x position, apply some force in that direction
-        final impulse = Vector2(dx.sign * 40, -20); // Adjust as needed
+        final impulse = Vector2(dx.sign * 35, -20); // Adjust as needed
         body.applyLinearImpulse(impulse);
       } else {
         //apply little force in that direction anyways, just to prevent any stalls
@@ -200,9 +200,9 @@ class Ball extends BodyComponent<Plinko> with ContactCallbacks {
         //make the collision with guiderails, extra strong on the extra direction
         //if the ball is already close to the bucket, don't do this
         if (other.guideRailPosition == GuideRailPosition.left) {
-          body.applyLinearImpulse(Vector2(100, -10));
+          body.applyLinearImpulse(Vector2(20, -10));
         } else {
-          body.applyLinearImpulse(Vector2(-100, -10));
+          body.applyLinearImpulse(Vector2(-20, -10));
         }
       }
     }

@@ -63,7 +63,7 @@ class Plinko extends Forge2DGame {
 
 
   //ball spawn logic //to pause spawning when engine is paused
-  var predeterminedMultiplier = 0;
+  double predeterminedMultiplier = 0;
   bool isSpawning = false;
   int ballsSpawned = 0; // Tracks the number of balls spawned
   void _startSpawningBalls() {
